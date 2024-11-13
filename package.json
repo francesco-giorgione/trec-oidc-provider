@@ -1,0 +1,31 @@
+{
+  "name": "trec-oidc-webapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@credo-ts/anoncreds": "^0.5.13",
+    "@credo-ts/askar": "^0.5.13",
+    "@credo-ts/cheqd": "^0.5.13",
+    "@credo-ts/core": "^0.5.13",
+    "@credo-ts/node": "^0.5.13",
+    "@hyperledger/anoncreds-nodejs": "^0.2.4",
+    "@hyperledger/aries-askar-nodejs": "^0.2.3",
+    "body-parser": "^1.20.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "express-session": "^1.18.1",
+    "oidc-provider": "file:./oidc-provider-v8.5.2.tgz",
+    "pug": "^3.0.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

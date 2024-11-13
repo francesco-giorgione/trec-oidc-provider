@@ -1,0 +1,9 @@
+block content
+    head
+        title Autorizza
+    body
+        h4 Stai per trasmettere i tuoi dati personali
+
+        form#interactionForm(method="POST", action=`/interaction/${uid}/confirm`)
+            button(type="submit") Conferma
+            button(type="button", onclick="window.history.back()") Annulla

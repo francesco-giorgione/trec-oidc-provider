@@ -1,0 +1,44 @@
+
+block content
+  head
+    script(src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js")
+
+  p#text #{url}
+
+  script.
+    (async () => {
+      try {
+        const oobId = '#{oob_id}'
+        const uid = '#{u_id}'
+        const url = `http://localhost:5000/interaction/${uid}/login`;
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({oob_id: oobId}),
+        });
+
+        if (!response.ok) {
+          throw new Error('Errore nella richiesta: ' + response.statusText);
+        }
+
+        /* const res = await response.json();
+        console.log('res:', res)
+
+        if(res.token) {
+          const decoded = jwt_decode(res.token);
+          document.getElementById('text').textContent = 'Login completed. Here is your JWT token data: \n' +
+                  decoded.name + ' ' + decoded.age
+        }
+        else {
+          document.getElementById('text').textContent = 'Login failed'
+        } */
+
+        const res = await response.text();
+        document.body.innerHTML = res;
+      } catch (error) {
+        console.error('Errore durante la richiesta:', error);
+      }
+    })();
