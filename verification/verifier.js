@@ -122,8 +122,16 @@ function setUpProofDoneListener(agent, objConnId, provider, req, res) {
             const proofData = yield agent.proofs.getFormatData(payload.proofRecord.id);
             const presentation = yield proofData.presentation;
             const attrs = presentation === null || presentation === void 0 ? void 0 : presentation.anoncreds.requested_proof.revealed_attrs;
-            // console.log('revealedAttrs:', attrs)
-            const data = { name: attrs.name.raw, age: attrs.age.raw };
+            console.log('revealedAttrs:', attrs);
+            const data = {
+                givenName: attrs.givenName.raw,
+                familyName: attrs.familyName.raw,
+                dateOfBirth: attrs.dateOfBirth.raw,
+                phone: attrs.phone.raw,
+                email: attrs.email.raw,
+                fiscalCode: attrs.fiscalCode.raw,
+                gender: attrs.gender.raw,
+            };
             /*const tkn = jwt.sign(data, JWT_SECRET, {expiresIn: '1h'});
             console.log('jwt_token:', tkn) */
             const result = {
@@ -141,16 +149,56 @@ function sendProofRequest(agent, connectionRecordId) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log('Requesting proof...');
         const proofAttribute = {
-            name: {
-                name: 'name',
+            givenName: {
+                name: 'givenName',
                 restrictions: [
                     {
                         cred_def_id: credentialDefinitionId
                     },
                 ],
             },
-            age: {
-                name: 'age',
+            familyName: {
+                name: 'familyName',
+                restrictions: [
+                    {
+                        cred_def_id: credentialDefinitionId
+                    },
+                ],
+            },
+            dateOfBirth: {
+                name: 'dateOfBirth',
+                restrictions: [
+                    {
+                        cred_def_id: credentialDefinitionId
+                    },
+                ],
+            },
+            phone: {
+                name: 'phone',
+                restrictions: [
+                    {
+                        cred_def_id: credentialDefinitionId
+                    },
+                ],
+            },
+            email: {
+                name: 'email',
+                restrictions: [
+                    {
+                        cred_def_id: credentialDefinitionId
+                    },
+                ],
+            },
+            fiscalCode: {
+                name: 'fiscalCode',
+                restrictions: [
+                    {
+                        cred_def_id: credentialDefinitionId
+                    },
+                ],
+            },
+            gender: {
+                name: 'gender',
                 restrictions: [
                     {
                         cred_def_id: credentialDefinitionId
@@ -171,4 +219,4 @@ function sendProofRequest(agent, connectionRecordId) {
         });
     });
 }
-const credentialDefinitionId = 'did:cheqd:testnet:92874297-d824-40ea-8ae5-364a1ec92389/resources/f7ecd49d-9a8f-41b9-963f-17a6a6a9236c';
+const credentialDefinitionId = 'did:cheqd:testnet:92874297-d824-40ea-8ae5-364a1ec92390/resources/2dcf67df-ab68-4563-8cfe-91e61fc88acb';
