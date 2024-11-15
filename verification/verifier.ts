@@ -28,6 +28,8 @@ import {agentDependencies, HttpInboundTransport} from '@credo-ts/node';
 import {AskarModule} from '@credo-ts/askar';
 import {
     CheqdAnonCredsRegistry,
+    CheqdDidRegistrar,
+    CheqdDidResolver,
     CheqdModule,
     CheqdModuleConfig,
 } from '@credo-ts/cheqd';
@@ -39,13 +41,11 @@ import {
 } from '@credo-ts/anoncreds';
 import {anoncreds} from '@hyperledger/anoncreds-nodejs';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-jwt-secret'
-
 const verifierConfig = {
-    label: 'verifier-agent',
+    label: 'verifier_sec',
     walletConfig: {
-        id: 'id_verifier',
-        key: 'key_verifier',
+        id: 'verifier_sec',
+        key: process.env.WALLET_KEY || 'CHANGE_YOUR_WALLET_KEY',
     },
     endpoints: ['http://localhost:3003'],
     // logger: new ConsoleLogger(LogLevel.debug)
@@ -65,11 +65,16 @@ export const verifier = new Agent({
             new CheqdModuleConfig({
                 networks: [
                     {
-                        network: 'testnet'
+                        network: 'testnet',
+                        cosmosPayerSeed: 'grab onion alien short practice pyramid where demise napkin phrase ill pitch'
                     },
                 ],
             })
         ),
+        dids: new DidsModule({
+            registrars: [new CheqdDidRegistrar()],
+            resolvers: [new CheqdDidResolver()],
+        }),
         anoncreds: new AnonCredsModule({
             registries: [new CheqdAnonCredsRegistry()],
             anoncreds,
@@ -144,9 +149,11 @@ export function setUpProofDoneListener(agent: Agent, objConnId: any, provider:an
 
         if(payload.proofRecord.state === ProofState.Done && payload.proofRecord.isVerified &&
                                             payload.proofRecord.connectionId == objConnId.connectionId) {
-
-            const proofData = await agent.proofs.getFormatData(payload.proofRecord.id);
+            
+            const proofData = await agent.proofs.getFormatData(payload.proofRecord.id);            
             const presentation = await proofData.presentation
+            console.log(JSON.stringify(presentation, null, 2));
+
             const attrs = (presentation as any)?.anoncreds.requested_proof.revealed_attrs
             console.log('revealedAttrs:', attrs)
 
@@ -162,7 +169,7 @@ export function setUpProofDoneListener(agent: Agent, objConnId: any, provider:an
 
             const result = {
                 "login": {
-                    accountId: '50',
+                    accountId: attrs.holderDid.raw,
                 },
             };
             
@@ -178,6 +185,14 @@ export async function sendProofRequest(agent: Agent, connectionRecordId: string)
     console.log('Requesting proof...')
 
     const proofAttribute = {
+        holderDid: {
+            name: 'holderDid',
+            restrictions: [
+                {
+                    cred_def_id: credentialDefinitionId
+                },
+            ],
+        },
         givenName: {
             name: 'givenName',
             restrictions: [
@@ -249,6 +264,6 @@ export async function sendProofRequest(agent: Agent, connectionRecordId: string)
     })
 }
 
-const credentialDefinitionId = 'did:cheqd:testnet:92874297-d824-40ea-8ae5-364a1ec92390/resources/2dcf67df-ab68-4563-8cfe-91e61fc88acb'
+const credentialDefinitionId = 'did:cheqd:testnet:87874297-d824-40ea-8ae5-364a1ec90051/resources/c9602433-2c6d-4eee-942f-ca41861c3229'
 
 

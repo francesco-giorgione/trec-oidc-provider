@@ -22,7 +22,7 @@
     "cors": "^2.8.5",
     "express": "^4.21.1",
     "express-session": "^1.18.1",
-    "oidc-provider": "file:./oidc-provider-v8.5.2.tgz",
+    "oidc-provider": "file:./oidc-provider-8.5.2.tgz",
     "pug": "^3.0.3"
   },
   "devDependencies": {

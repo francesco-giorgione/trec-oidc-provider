@@ -22,12 +22,11 @@ const cheqd_1 = require("@credo-ts/cheqd");
 const aries_askar_nodejs_1 = require("@hyperledger/aries-askar-nodejs");
 const anoncreds_1 = require("@credo-ts/anoncreds");
 const anoncreds_nodejs_1 = require("@hyperledger/anoncreds-nodejs");
-const JWT_SECRET = process.env.JWT_SECRET || 'your-jwt-secret';
 const verifierConfig = {
-    label: 'verifier-agent',
+    label: 'verifier_sec',
     walletConfig: {
-        id: 'id_verifier',
-        key: 'key_verifier',
+        id: 'verifier_sec',
+        key: process.env.WALLET_KEY || 'CHANGE_YOUR_WALLET_KEY',
     },
     endpoints: ['http://localhost:3003'],
     // logger: new ConsoleLogger(LogLevel.debug)
@@ -45,10 +44,15 @@ exports.verifier = new core_1.Agent({
         cheqd: new cheqd_1.CheqdModule(new cheqd_1.CheqdModuleConfig({
             networks: [
                 {
-                    network: 'testnet'
+                    network: 'testnet',
+                    cosmosPayerSeed: 'grab onion alien short practice pyramid where demise napkin phrase ill pitch'
                 },
             ],
         })),
+        dids: new core_1.DidsModule({
+            registrars: [new cheqd_1.CheqdDidRegistrar()],
+            resolvers: [new cheqd_1.CheqdDidResolver()],
+        }),
         anoncreds: new anoncreds_1.AnonCredsModule({
             registries: [new cheqd_1.CheqdAnonCredsRegistry()],
             anoncreds: anoncreds_nodejs_1.anoncreds,
@@ -121,6 +125,7 @@ function setUpProofDoneListener(agent, objConnId, provider, req, res) {
             payload.proofRecord.connectionId == objConnId.connectionId) {
             const proofData = yield agent.proofs.getFormatData(payload.proofRecord.id);
             const presentation = yield proofData.presentation;
+            console.log(JSON.stringify(presentation, null, 2));
             const attrs = presentation === null || presentation === void 0 ? void 0 : presentation.anoncreds.requested_proof.revealed_attrs;
             console.log('revealedAttrs:', attrs);
             const data = {
@@ -132,11 +137,9 @@ function setUpProofDoneListener(agent, objConnId, provider, req, res) {
                 fiscalCode: attrs.fiscalCode.raw,
                 gender: attrs.gender.raw,
             };
-            /*const tkn = jwt.sign(data, JWT_SECRET, {expiresIn: '1h'});
-            console.log('jwt_token:', tkn) */
             const result = {
                 "login": {
-                    accountId: '50',
+                    accountId: attrs.holderDid.raw,
                 },
             };
             req.session.customData = data;
@@ -149,6 +152,14 @@ function sendProofRequest(agent, connectionRecordId) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log('Requesting proof...');
         const proofAttribute = {
+            holderDid: {
+                name: 'holderDid',
+                restrictions: [
+                    {
+                        cred_def_id: credentialDefinitionId
+                    },
+                ],
+            },
             givenName: {
                 name: 'givenName',
                 restrictions: [
@@ -219,4 +230,4 @@ function sendProofRequest(agent, connectionRecordId) {
         });
     });
 }
-const credentialDefinitionId = 'did:cheqd:testnet:92874297-d824-40ea-8ae5-364a1ec92390/resources/2dcf67df-ab68-4563-8cfe-91e61fc88acb';
+const credentialDefinitionId = 'did:cheqd:testnet:87874297-d824-40ea-8ae5-364a1ec90051/resources/c9602433-2c6d-4eee-942f-ca41861c3229';

@@ -6,6 +6,7 @@ const session = require('express-session')
 const getOidcProvider = require('./provider');
 const verify = require('./verification/verifier.js');
 const path = require('path');
+const once = require('./verification/once.js');
 
 
 function setNoCache(req, res, next) {
@@ -47,7 +48,16 @@ function setApp() {
 verify.getInitializedAgent().then(async agent => {
     const app = setApp();
     app.locals.agent = agent;
-    app.locals.dataMap = {}
+
+    const didID = process.env.DID_ID || 'CHANGE_YOUR_DID_ID'
+
+    // Uncomment only at first execution
+    // console.log('Creating the DID...')
+    // await once.createDid(app.locals.agent, didID).then(r => {})
+
+    // const created_dids = await app.locals.agent.dids.getCreatedDids();
+    // console.log('created dids:', created_dids)
+    
     const provider = await getOidcProvider()
 
     app.get('/interaction/:uid', setNoCache, async (req, res, next) => {
