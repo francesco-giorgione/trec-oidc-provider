@@ -16,10 +16,7 @@ async function myFindAccount(ctx, accountId) {
         async claims(use, scope, claims, rejected) {
             return {
                 sub: accountId,
-                trec: {
-                    name:   customData.name,
-                    age:  customData.age
-                }
+                trec: customData
             }
         }
     }
@@ -35,7 +32,7 @@ async function getOidcProvider() {
             address: ['address'],
             email: ['email', 'email_verified'],
             phone: ['phone_number', 'phone_number_verified'],
-            profile: ['name', 'age'],
+            profile: ['trec'],
         },
         clients: [
             {
