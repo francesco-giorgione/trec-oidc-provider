@@ -152,10 +152,10 @@ export function setUpProofDoneListener(agent: Agent, objConnId: any, provider:an
             
             const proofData = await agent.proofs.getFormatData(payload.proofRecord.id);            
             const presentation = await proofData.presentation
-            console.log(JSON.stringify(presentation, null, 2));
+            // console.log(JSON.stringify(presentation, null, 2));
 
             const attrs = (presentation as any)?.anoncreds.requested_proof.revealed_attrs
-            console.log('revealedAttrs:', attrs)
+            // console.log('revealedAttrs:', attrs)
 
             const data = {
                 givenName: attrs.givenName.raw,

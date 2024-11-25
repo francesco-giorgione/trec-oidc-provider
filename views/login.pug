@@ -24,18 +24,6 @@ block content
           throw new Error('Errore nella richiesta: ' + response.statusText);
         }
 
-        /* const res = await response.json();
-        console.log('res:', res)
-
-        if(res.token) {
-          const decoded = jwt_decode(res.token);
-          document.getElementById('text').textContent = 'Login completed. Here is your JWT token data: \n' +
-                  decoded.name + ' ' + decoded.age
-        }
-        else {
-          document.getElementById('text').textContent = 'Login failed'
-        } */
-
         const res = await response.text();
         document.body.innerHTML = res;
       } catch (error) {

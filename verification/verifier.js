@@ -125,9 +125,9 @@ function setUpProofDoneListener(agent, objConnId, provider, req, res) {
             payload.proofRecord.connectionId == objConnId.connectionId) {
             const proofData = yield agent.proofs.getFormatData(payload.proofRecord.id);
             const presentation = yield proofData.presentation;
-            console.log(JSON.stringify(presentation, null, 2));
+            // console.log(JSON.stringify(presentation, null, 2));
             const attrs = presentation === null || presentation === void 0 ? void 0 : presentation.anoncreds.requested_proof.revealed_attrs;
-            console.log('revealedAttrs:', attrs);
+            // console.log('revealedAttrs:', attrs)
             const data = {
                 givenName: attrs.givenName.raw,
                 familyName: attrs.familyName.raw,

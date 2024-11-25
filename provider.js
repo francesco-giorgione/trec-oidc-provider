@@ -24,15 +24,9 @@ async function myFindAccount(ctx, accountId) {
 
 async function getOidcProvider() {
     const { Provider } = await import('oidc-provider');
-    const provider = new Provider('http://localhost:5000', {
-        audiences: async (ctx, token, client) => {
-            return 'my-global-audience';
-        },
+    const provider = new Provider('https://ssi.dlab.stream', {
         claims: {
-            address: ['address'],
-            email: ['email', 'email_verified'],
-            phone: ['phone_number', 'phone_number_verified'],
-            profile: ['trec'],
+            trec: ['trec'],
         },
         clients: [
             {

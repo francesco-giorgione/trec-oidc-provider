@@ -2,8 +2,19 @@ block content
     head
         title Autorizza
     body
-        h4 Stai per trasmettere i tuoi dati personali
+        h4 Stai autorizzando il trasferimento dei tuoi dati
+        ul
+            li Il tuo DID
+            li Nome
+            li Cognome
+            li Data di nascita
+            li Telefono
+            li Email
+            li Codice fiscale
+            li Sesso
 
         form#interactionForm(method="POST", action=`/interaction/${uid}/confirm`)
             button(type="submit") Conferma
-            button(type="button", onclick="window.history.back()") Annulla
+
+        form#cancelForm(method="GET", action=`http://localhost:4200`)
+            button(type="submit") Annulla

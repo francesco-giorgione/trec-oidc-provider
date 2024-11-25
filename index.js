@@ -79,6 +79,10 @@ verify.getInitializedAgent().then(async agent => {
                     return res.render('login', {url: invitationUrl, oob_id: oobId, u_id: uid})
                 }
                 case 'consent': {
+                    console.log('sono in consent')
+                    console.log('details:', prompt.details)
+                    console.log('params:', params)
+                    
                     return res.render('interaction', {
                         client,
                         uid,
@@ -153,53 +157,14 @@ verify.getInitializedAgent().then(async agent => {
         }
     });
 
-    app.get('/connect', async function (req, res, next) {
+    /* app.get('/connect', async function (req, res, next) {
         console.log('Got AJAX request from the client')
         const oobId = req.query.oob_id
         const objConnId = {}
 
         verify.setupConnectionListener(req.app.locals.agent, oobId, objConnId);
         verify.setUpProofDoneListener(req.app.locals.agent, objConnId, provider, req, res);
-    });
-
-/*
-    app.post('/token', (req, res) => {
-        console.log('sono in token')
-        console.log(req.body)
-        
-        const { grant_type, code, redirect_uri, client_id, client_secret } = req.body;
-
-        if(grant_type == 'authorization_code') {
-            const response = {
-                "access_token":"MnVV989mQUcEsTeDDNCVVrEdoTUDPDhCsFBVdiuRtVR",
-                "expires_in":15,
-                "scope":"openid",
-                "token_type":"Bearer"
-            }
-
-            res.json(response)
-        }
-
-        /*
-        if (client_id !== 'YOUR_CLIENT_ID' || client_secret !== 'YOUR_CLIENT_SECRET') {
-            return res.status(401).json({ error: 'invalid_client' });
-        }
-
-        if (grant_type === 'authorization_code') {
-            // Qui dovresti verificare il codice e generare un access_token
-            const accessToken = 'GENERATED_ACCESS_TOKEN'; // Logica per generare il token
-            const refreshToken = 'GENERATED_REFRESH_TOKEN'; // Logica per generare il refresh token
-
-            return res.json({
-                access_token: accessToken,
-                token_type: 'Bearer',
-                expires_in: 3600,
-                refresh_token: refreshToken,
-            });
-        } else {
-            return res.status(400).json({ error: 'unsupported_grant_type' });
-        }
-    });*/
+    }); */
 
     app.use(provider.callback())
-})
+})  
