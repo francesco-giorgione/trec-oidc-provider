@@ -4,7 +4,7 @@ block content
     body
         h4 Stai autorizzando il trasferimento dei tuoi dati
         ul
-            li Il tuo DID
+            li DID Id
             li Nome
             li Cognome
             li Data di nascita
@@ -16,5 +16,5 @@ block content
         form#interactionForm(method="POST", action=`/interaction/${uid}/confirm`)
             button(type="submit") Conferma
 
-        form#cancelForm(method="GET", action=`http://localhost:4200`)
+        form#cancelForm(method="POST", action=`/interaction/${uid}/abort`)
             button(type="submit") Annulla

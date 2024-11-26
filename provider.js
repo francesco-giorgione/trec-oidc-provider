@@ -40,6 +40,9 @@ async function getOidcProvider() {
                 token_endpoint_auth_method: 'client_secret_post',
             },
         ],
+        cookies:  {
+            keys: ['chiave_1_da_modificare', 'chiave_2_da_modificare', 'chiave_3_da_modificare']
+        },
         features: {
             introspection: { enabled: true },   // da cambiare in true
             revocation: { enabled: true },

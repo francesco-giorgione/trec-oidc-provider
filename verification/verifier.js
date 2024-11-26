@@ -100,7 +100,6 @@ function getInvitation(agent) {
         try {
             console.log('Creating the invitation for the holder...');
             const invitation = yield createNewInvitation(agent);
-            console.log('url: ' + invitation.invitationUrl);
             return invitation;
         }
         catch (error) {

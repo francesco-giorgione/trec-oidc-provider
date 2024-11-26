@@ -68,6 +68,10 @@ verify.getInitializedAgent().then(async agent => {
 
             const client = await provider.Client.find(params.client_id);
 
+            // console.log('prompt:', prompt)
+            // console.log('params:', params)
+            // console.log('session:', session)
+
             switch (prompt.name) {
                 case 'login': {
                     console.log('Login request received')
@@ -79,16 +83,15 @@ verify.getInitializedAgent().then(async agent => {
                     return res.render('login', {url: invitationUrl, oob_id: oobId, u_id: uid})
                 }
                 case 'consent': {
-                    console.log('sono in consent')
-                    console.log('details:', prompt.details)
-                    console.log('params:', params)
+                    // console.log('sono in consent')
+                    // console.log('details:', prompt.details)
+                    // console.log('params:', params)
                     
                     return res.render('interaction', {
                         client,
                         uid,
                         details: prompt.details,
                         params,
-                        title: 'Authorize',
                     });
                 }
                 default:
@@ -157,14 +160,21 @@ verify.getInitializedAgent().then(async agent => {
         }
     });
 
-    /* app.get('/connect', async function (req, res, next) {
-        console.log('Got AJAX request from the client')
-        const oobId = req.query.oob_id
-        const objConnId = {}
-
-        verify.setupConnectionListener(req.app.locals.agent, oobId, objConnId);
-        verify.setUpProofDoneListener(req.app.locals.agent, objConnId, provider, req, res);
-    }); */
+    app.post('/interaction/:uid/abort', async function (req, res, next) {
+        const interactionDetails = await provider.interactionDetails(req, res);
+        const { prompt: { name, details }, params, session: { accountId } } = interactionDetails;
+        
+        try {
+            const result = {
+                login: accountId,
+                error: 'access_denied',
+                error_description: 'End-User aborted interaction',
+            };
+            await provider.interactionFinished(req, res, result, { mergeWithLastSubmission: true });
+        } catch (err) {
+            next(err);
+        }
+    });
 
     app.use(provider.callback())
 })  

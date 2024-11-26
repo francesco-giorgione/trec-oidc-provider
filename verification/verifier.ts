@@ -123,7 +123,6 @@ export async function getInvitation(agent: Agent) {
     try {
         console.log('Creating the invitation for the holder...');
         const invitation = await createNewInvitation(agent);
-        console.log('url: ' + invitation.invitationUrl)
 
         return invitation
     } catch (error) {
