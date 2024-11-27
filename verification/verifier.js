@@ -126,8 +126,9 @@ function setUpProofDoneListener(agent, objConnId, provider, req, res) {
             const presentation = yield proofData.presentation;
             // console.log(JSON.stringify(presentation, null, 2));
             const attrs = presentation === null || presentation === void 0 ? void 0 : presentation.anoncreds.requested_proof.revealed_attrs;
-            // console.log('revealedAttrs:', attrs)
+            console.log('revealedAttrs:', attrs);
             const data = {
+                issuerDid: attrs.issuerDid.raw,
                 givenName: attrs.givenName.raw,
                 familyName: attrs.familyName.raw,
                 dateOfBirth: attrs.dateOfBirth.raw,
@@ -151,6 +152,14 @@ function sendProofRequest(agent, connectionRecordId) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log('Requesting proof...');
         const proofAttribute = {
+            issuerDid: {
+                name: 'issuerDid',
+                restrictions: [
+                    {
+                        cred_def_id: credentialDefinitionId
+                    },
+                ],
+            },
             holderDid: {
                 name: 'holderDid',
                 restrictions: [
@@ -229,4 +238,4 @@ function sendProofRequest(agent, connectionRecordId) {
         });
     });
 }
-const credentialDefinitionId = 'did:cheqd:testnet:87874297-d824-40ea-8ae5-364a1ec90051/resources/c9602433-2c6d-4eee-942f-ca41861c3229';
+const credentialDefinitionId = 'did:cheqd:testnet:87874297-d824-40ea-8ae5-364a1ec90051/resources/46b1effe-a91c-40a0-b0da-c7ad957c88c7';

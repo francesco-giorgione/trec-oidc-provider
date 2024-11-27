@@ -23,6 +23,7 @@ async function myFindAccount(ctx, accountId) {
 }
 
 async function getOidcProvider() {
+    require('dotenv').config();
     const { Provider } = await import('oidc-provider');
     const provider = new Provider('https://ssi.dlab.stream', {
         claims: {
@@ -31,7 +32,7 @@ async function getOidcProvider() {
         clients: [
             {
                 allow_refresh_tokens: true,
-                client_id: 'c_24f7d433899443d68ca84ad4913ec53f',
+                client_id: process.env.TREC_ID || 'c_24f7d433899443d68ca84ad4913ec53f',
                 client_secret: 'test_secret',
                 redirect_uris: ['http://localhost:4200/auth/aac/callback'],
                 response_types: ['code'],
