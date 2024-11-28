@@ -39,7 +39,7 @@ function setApp() {
     app.set('views', path.join(__dirname, 'views'));
 
     app.listen(5000, () => {
-        console.log('OIDC Provider in esecuzione su http://localhost:5000');
+        console.log('OIDC Provider executing on http://localhost:5000');
     });
 
     return app;
@@ -68,14 +68,8 @@ verify.getInitializedAgent().then(async agent => {
 
             const client = await provider.Client.find(params.client_id);
 
-            // console.log('prompt:', prompt)
-            // console.log('params:', params)
-            // console.log('session:', session)
-
             switch (prompt.name) {
                 case 'login': {
-                    console.log('Login request received')
-
                     const result = await verify.getInvitation(req.app.locals.agent)
                     const invitationUrl = result.invitationUrl
                     const oobId = result.oob.id
@@ -83,10 +77,6 @@ verify.getInitializedAgent().then(async agent => {
                     return res.render('login', {url: invitationUrl, oob_id: oobId, u_id: uid})
                 }
                 case 'consent': {
-                    // console.log('sono in consent')
-                    // console.log('details:', prompt.details)
-                    // console.log('params:', params)
-                    
                     return res.render('interaction', {
                         client,
                         uid,
@@ -103,12 +93,9 @@ verify.getInitializedAgent().then(async agent => {
     });
 
     app.post('/interaction/:uid/login', async (req, res) => {
-        console.log('Got AJAX request from the client')
+        console.log('/login API: got AJAX request from the client')
         const oobId = req.body.oob_id
         const objConnId = {}
-
-        // const details = await provider.interactionDetails(req, res)
-        // console.log('details in interaction/login', details)
 
         verify.setupConnectionListener(req.app.locals.agent, oobId, objConnId);
         verify.setUpProofDoneListener(req.app.locals.agent, objConnId, provider, req, res);
@@ -118,7 +105,6 @@ verify.getInitializedAgent().then(async agent => {
         try {
             const interactionDetails = await provider.interactionDetails(req, res);
             const { prompt: { name, details }, params, session: { accountId } } = interactionDetails;
-            // assert.equal(name, 'consent');
 
             const oobId = interactionDetails.lastSubmission.login.oobId
 

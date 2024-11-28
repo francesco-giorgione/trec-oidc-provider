@@ -16,15 +16,12 @@ function createDid(agent, didID) {
         const key = yield agent.wallet.createKey({
             keyType: core_1.KeyType.Ed25519,
         });
-        // encode public key according to the verification method
         const ed25519PublicKeyBase58 = key.publicKeyBase58;
-        // Create a DID
         const did = yield agent.dids.create({
             method: 'cheqd',
             secret: {},
             options: {},
             didDocument: new core_1.DidDocument({
-                // Sintassi standard
                 id: didID,
                 // controller = id --> possessore del DID ha pieno controllo su di esso
                 controller: [didID],

@@ -11,17 +11,14 @@ export async function createDid(agent: Agent, didID: string) {
     const key = await agent.wallet.createKey({
         keyType: KeyType.Ed25519,
     });
-
-    // encode public key according to the verification method
+    
     const ed25519PublicKeyBase58 = key.publicKeyBase58;
-
-    // Create a DID
+    
     const did = await agent.dids.create<CheqdDidCreateOptions>({
         method: 'cheqd',
         secret: {},
         options: {},
         didDocument: new DidDocument({
-            // Sintassi standard
             id: didID,
             // controller = id --> possessore del DID ha pieno controllo su di esso
             controller: [didID],

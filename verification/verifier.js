@@ -29,7 +29,7 @@ const verifierConfig = {
         key: process.env.WALLET_KEY || 'CHANGE_YOUR_WALLET_KEY',
     },
     endpoints: ['http://localhost:3003'],
-    // logger: new ConsoleLogger(LogLevel.debug)
+    logger: new core_1.ConsoleLogger(core_1.LogLevel.debug)
 };
 exports.verifier = new core_1.Agent({
     config: verifierConfig,

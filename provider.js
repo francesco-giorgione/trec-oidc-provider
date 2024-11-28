@@ -1,6 +1,5 @@
 
 async function myFindAccount(ctx, accountId) {
-    console.log('Account ID: ', accountId)
     let customData = ctx.req.session.customData
 
     if (customData === undefined) {
@@ -8,8 +7,6 @@ async function myFindAccount(ctx, accountId) {
         const oldSession = JSON.parse(ctx.req.sessionStore.sessions[oldSessionId])
         customData = oldSession.customData
     }
-
-    console.log('customData:', customData)
 
     return {
         accountId: accountId,

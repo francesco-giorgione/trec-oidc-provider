@@ -6,16 +6,10 @@ import {
     ConnectionsModule,
     ConnectionStateChangedEvent,
     ConsoleLogger,
-    CredentialEventTypes,
-    CredentialExchangeRecord,
-    CredentialState,
-    CredentialStateChangedEvent,
     DidExchangeState,
     DidsModule,
     HttpOutboundTransport,
     LogLevel,
-    OutOfBandRecord,
-    ProofExchangeRecord,
     ProofEventTypes,
     ProofsModule,
     ProofState,
@@ -48,7 +42,7 @@ const verifierConfig = {
         key: process.env.WALLET_KEY || 'CHANGE_YOUR_WALLET_KEY',
     },
     endpoints: ['http://localhost:3003'],
-    // logger: new ConsoleLogger(LogLevel.debug)
+    logger: new ConsoleLogger(LogLevel.debug)
 };
 
 export const verifier = new Agent({
