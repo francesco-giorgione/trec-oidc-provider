@@ -29,7 +29,7 @@ const verifierConfig = {
         key: process.env.WALLET_KEY || 'CHANGE_YOUR_WALLET_KEY',
     },
     endpoints: ['http://localhost:3003'],
-    logger: new core_1.ConsoleLogger(core_1.LogLevel.debug)
+    // logger: new ConsoleLogger(LogLevel.debug)
 };
 exports.verifier = new core_1.Agent({
     config: verifierConfig,
@@ -238,4 +238,4 @@ function sendProofRequest(agent, connectionRecordId) {
         });
     });
 }
-const credentialDefinitionId = 'did:cheqd:testnet:87874297-d824-40ea-8ae5-364a1ec90051/resources/46b1effe-a91c-40a0-b0da-c7ad957c88c7';
+const credentialDefinitionId = 'did:cheqd:testnet:87874297-d824-40ea-8ae5-364a1ec90101/resources/dfde04c2-eeca-4cd5-8ff8-36cb028dd198';

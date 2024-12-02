@@ -63,7 +63,7 @@ verify.getInitializedAgent().then(async agent => {
     app.get('/interaction/:uid', setNoCache, async (req, res, next) => {
         try {
             const {
-                uid, prompt, params, session
+                uid, prompt, params
             } = await provider.interactionDetails(req, res);
 
             const client = await provider.Client.find(params.client_id);

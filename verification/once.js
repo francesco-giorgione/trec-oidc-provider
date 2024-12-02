@@ -23,13 +23,11 @@ function createDid(agent, didID) {
             options: {},
             didDocument: new core_1.DidDocument({
                 id: didID,
-                // controller = id --> possessore del DID ha pieno controllo su di esso
                 controller: [didID],
                 verificationMethod: [
                     {
                         id: didID + '#' + key.fingerprint,
                         type: 'Ed25519VerificationKey2018',
-                        // controller = did
                         controller: didID,
                         publicKeyBase58: ed25519PublicKeyBase58,
                     },
