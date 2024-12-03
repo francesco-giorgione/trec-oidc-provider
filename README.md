@@ -1,5 +1,6 @@
 # TreC-oidc-provider
-Questa è la repo principale del progetto sviluppato durante la mia attività di tirocinio presso lo spin-off INNOVA4TECH, 
+Questa è la repo principale del progetto sviluppato durante la mia attività di tirocinio presso lo spin-off INNOVA4TECH
+dell'Università degli Studi di Salerno, 
 sotto la supervisione del prof. Christian Esposito e del dott. Biagio Boi.
 
 # Struttura
