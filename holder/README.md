@@ -1,4 +1,8 @@
 # Holder
+Sono richieste le seguenti dipendenze
+- `npm` versione 10.4.0
+- `node` versione 18.x
+
 Per avviare il server, è necessario
 
 a) creare un nuovo progetto Express.js che includa l'intera cartella _holder_ della repo principale;
