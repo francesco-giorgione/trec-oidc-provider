@@ -45,7 +45,7 @@ a) generare nella path principale un file .env contenente le seguenti variabili 
 - WALLET_KEY: chiave per la protezione del wallet dell'agente
 - DID_ID: ID del DID che si vuole creare per l'agente (deve essere della forma cheqd:testnet:92874297-d824-40ea-8ae5-364a1ec90063,
     le cifre dopo **testnet:** possono essere fissate in modo arbitario, ma devono essere univoche)
-- TREC_ID: il valore indicato è l'id dell'app, concordato con FBK e inserito nell'access token.
+- TREC_ID: il valore indicato è l'id dell'app, concordato con FBK e inserito nell'access token
 
 
 b) installare le dipendenze del progetto;
@@ -53,7 +53,7 @@ b) installare le dipendenze del progetto;
     npm install
 ```
 
-c) modificare i seguenti ulteriori parametri di sicurezza.
+c) modificare i seguenti ulteriori parametri di sicurezza (opzionale per l'avvio).
 
 | PARAMETRO             | FILE        |
 |-----------------------|-------------|

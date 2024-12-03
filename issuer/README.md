@@ -1,7 +1,7 @@
 # Issuer
 Per avviare il server, è necessario
 
-a) creare un nuovo progetto Express.js che includa l'intera cartella _issuer_;
+a) creare un nuovo progetto Express.js che includa l'intera cartella _issuer_ della repo principale;
 
 b) generare nella path principale del nuovo progetto un file .env contenente le seguenti variabili d'ambiente:
 
@@ -31,20 +31,18 @@ e) eseguire il comando di avvio per la creazione del DID, dello schema di creden
 f) sostituire con il nuovo _credentialDefinitionId_ il valore di _const credentialDefinitionId_ a riga 164;
 
 g) nel progetto del verifier (progetto principale), sostituire con il nuovo _credentialDefinitionId_ il valore di _const credentialDefinitionId_ a riga 269
-del file **src/verifier.ts**;
-_Nota:_ se il provider OIDC è già in esecuzione, è necessario ricompilare **src/verifier.ts** tramite il comando `tsc`,
+del file **src/verifier.ts**; se il provider OIDC è già in esecuzione, è necessario ricompilare **src/verifier.ts** tramite il comando `tsc`,
 per poi riavviare il server.
 
 h) nel file **src/issuer.ts**, commentare il codice dalle righe 171-178 e decommentare il codice
 delle righe 181-186;
 
-i) eseguire nuovamente il comando di avvio: l'holder è ora pronto per interagire con gli altri agenti tramite i link di
-invito.
+i) eseguire nuovamente il comando di avvio: l'issuer è ora pronto per interagire con l'holder.
 ```
     npx tsx src/holder.ts
 ```
 
-Per successive interazioni con gli agenti, è sufficiente ripetere lo step _(i)_.
+Per successive interazioni con l'holder, è sufficiente ripetere lo step _(i)_.
 
-_Nota:_ il runtime `tsx` eseguie automaticamente la compilazione del codice TypeScript. Pertanto, in seguito all'apportazione
+_Nota:_ il runtime `tsx` esegue automaticamente la compilazione del codice TypeScript. Pertanto, in seguito all'apportazione
 di eventuali modifiche al codice, è sufficiente ri-eseguire il comando `npx tsx` affinché esse abbiano effetto.
