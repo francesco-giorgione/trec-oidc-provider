@@ -36,9 +36,9 @@ Per avviare il server, è necessario
 
 a) generare nella path principale un file .env contenente le seguenti variabili d'ambiente:
 
-| DEBUG            | SESSION_SECRET | WALLET_KEY | DID_ID                 | TREC_ID                            |
-|------------------|----------------|------------|------------------------|------------------------------------|
-| oidc-provider:*  | <your-secret>  | <your-key> | <your-verifier-did-id> | c_24f7d433899443d68ca84ad4913ec53f |
+| DEBUG            | SESSION_SECRET  | WALLET_KEY   | DID_ID                   | TREC_ID                            |
+|------------------|-----------------|--------------|--------------------------|------------------------------------|
+| oidc-provider:*  | \<your-secret\> | \<your-key\> | \<your-verifier-did-id\> | c_24f7d433899443d68ca84ad4913ec53f |
 
 - DEBUG: il valore indicato abilita la stampa di messaggi di debug sul provider OIDC
 - SESSION_SECRET: chiave per la cifratura dei cookie di sessione
