@@ -24,7 +24,7 @@ il loro avvio. Il README dell'issuer e dell'holder è reperibile nelle rispettiv
 
 
 # Setup
-Prima di avviare il verifier, si raccomanda di eseguire preventivamente il setup, in ordine, dell'holder e dell'issuer (vedi i 
+Prima di eseguire le seguenti istruzioni, si raccomanda di eseguire preventivamente il setup, in ordine, dell'holder e dell'issuer (vedi i 
 rispettivi README).
 
 Sono richieste le seguenti dipendenze
