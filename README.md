@@ -21,7 +21,7 @@ La repo contiene anche una cartella per ciascuno degli altri due agenti del sist
 - l'holder, per la ricezione delle credenziali verificabili e il loro inoltro al provider OIDC.
 
 Per ciascuno dei tre agenti, è presente un README che ne fornisce le informazioni principali, comprese le istruzioni per
-il loro avvio. Il README dell'issuer e dell'holder è reperibile nelle rispettive cartelle.
+il loro avvio. I README dell'issuer e dell'holder sono reperibili nelle rispettive cartelle.
 
 
 # Setup
