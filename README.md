@@ -24,27 +24,27 @@ il loro avvio. Il README dell'issuer e dell'holder è reperibile nelle rispettiv
 
 
 # Setup
-Prima di avviare il verifier, si raccomanda di eseguire preventivamente il setup dell'issuer e dell'holder (vedi i 
+Prima di avviare il verifier, si raccomanda di eseguire preventivamente il setup, in ordine, dell'holder e dell'issuer (vedi i 
 rispettivi README).
 
 Sono richieste le seguenti dipendenze
-- npm versione 10.4.0
-- node versione 18.x
+- `npm` versione 10.4.0
+- `node` versione 18.x
 
 ## Provider OIDC
 Per avviare il server, è necessario
 
-a) generare un file .env contenente le seguenti variabili d'ambiente:
+a) generare nella path principale un file .env contenente le seguenti variabili d'ambiente:
 
-| DEBUG            | SESSION_SECRET | WALLET_KEY | DID_ID     | TREC_ID                            |
-|------------------|----------------|------------|------------|------------------------------------|
-| oidc-provider:*  | XXX            | XXX        | XXX        | c_24f7d433899443d68ca84ad4913ec53f |
+| DEBUG            | SESSION_SECRET | WALLET_KEY | DID_ID                 | TREC_ID                            |
+|------------------|----------------|------------|------------------------|------------------------------------|
+| oidc-provider:*  | <your-secret>  | <your-key> | <your-verifier-did-id> | c_24f7d433899443d68ca84ad4913ec53f |
 
 - DEBUG: il valore indicato abilita la stampa di messaggi di debug sul provider OIDC
 - SESSION_SECRET: chiave per la cifratura dei cookie di sessione
 - WALLET_KEY: chiave per la protezione del wallet dell'agente
 - DID_ID: ID del DID che si vuole creare per l'agente (deve essere della forma cheqd:testnet:92874297-d824-40ea-8ae5-364a1ec90063,
-    le cifre dopo **testnet:** possono essere fissate in modo arbitario)
+    le cifre dopo **testnet:** possono essere fissate in modo arbitario, ma devono essere univoche)
 - TREC_ID: il valore indicato è l'id dell'app, concordato con FBK e inserito nell'access token.
 
 
