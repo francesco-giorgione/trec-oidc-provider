@@ -5,9 +5,9 @@ a) creare un nuovo progetto Express.js che includa l'intera cartella _holder_ de
 
 b) generare nella path principale del nuovo progetto un file .env contenente le seguenti variabili d'ambiente:
 
-| WALLET_KEY | DID_ID               | 
-|------------|----------------------|
-| <your-key> | <your-holder-did-id> |
+| WALLET_KEY   | DID_ID                 | 
+|--------------|------------------------|
+| \<your-key\> | \<your-holder-did-id\> |
 
 - WALLET_KEY: chiave per la protezione del wallet dell'agente
 - DID_ID: ID del DID che si vuole creare per l'agente (deve essere della forma cheqd:testnet:92874297-d824-40ea-8ae5-364a1ec90063,
