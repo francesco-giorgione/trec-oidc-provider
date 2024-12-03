@@ -19,7 +19,7 @@ c) installare le dipendenze del progetto;
     npm install
 ```
 
-d) nel file **src/issuer.ts**, decommentare il codice dalle righe 171-178 e commentare il codice
+d) nel file **src/issuer.ts**, decommentare il codice delle righe 171-178 e commentare il codice
 delle righe 181-186;
 
 e) eseguire il comando di avvio per la creazione del DID, dello schema di credenziali e della _credential definition_
@@ -31,10 +31,10 @@ e) eseguire il comando di avvio per la creazione del DID, dello schema di creden
 f) sostituire con il nuovo _credentialDefinitionId_ il valore di _const credentialDefinitionId_ a riga 164;
 
 g) nel progetto del verifier (progetto principale), sostituire con il nuovo _credentialDefinitionId_ il valore di _const credentialDefinitionId_ a riga 269
-del file **src/verifier.ts**; se il provider OIDC è già in esecuzione, è necessario ricompilare **src/verifier.ts** tramite il comando `tsc`,
+del file **verification/verifier.ts**; se il provider OIDC è già in esecuzione, è necessario ricompilare **src/verifier.ts** tramite il comando `tsc`,
 per poi riavviare il server.
 
-h) nel file **src/issuer.ts**, commentare il codice dalle righe 171-178 e decommentare il codice
+h) nel file **src/issuer.ts**, commentare il codice delle righe 171-178 e decommentare il codice
 delle righe 181-186;
 
 i) eseguire nuovamente il comando di avvio: l'issuer è ora pronto per interagire con l'holder.

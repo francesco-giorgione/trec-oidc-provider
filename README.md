@@ -60,10 +60,12 @@ c) modificare i seguenti ulteriori parametri di sicurezza (opzionale per l'avvio
 | provider.cookies.keys | provider.js |
 | provider.jwks.keys    | provider.js |
 
-d) nel file **verifier.ts**, modificare il valore di _const credentialDefinitionId_ (riga 269)
+d) nel file **verification/verifier.ts**, modificare il valore di _const credentialDefinitionId_ (riga 269)
 con l'id delle credenziali generate in fase di setup dell'issuer;
 
-e) eseguire il comando di avvio:
+e) ricompilare il file **verification/verifier.ts** tramite il comando `tsc`;
+
+f) eseguire il comando di avvio:
 ```
     node index.js
 ```

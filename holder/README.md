@@ -18,7 +18,7 @@ c) installare le dipendenze del progetto;
     npm install
 ```
 
-d) nel file **src/holder.ts**, decommentare il codice dalle righe 181-187 e commentare il codice
+d) nel file **src/holder.ts**, decommentare il codice delle righe 181-187 e commentare il codice
 delle righe 190-199;
 
 e) eseguire il comando di avvio per la creazione del DID;
@@ -26,7 +26,7 @@ e) eseguire il comando di avvio per la creazione del DID;
     npx tsx src/holder.ts
 ```
 
-f) nel file **src/holder.ts**, commentare il codice dalle righe 181-187 e decommentare il codice
+f) nel file **src/holder.ts**, commentare il codice delle righe 181-187 e decommentare il codice
 delle righe 190-199;
 
 g) eseguire nuovamente il comando di avvio: l'holder è ora pronto per interagire con gli altri agenti tramite i link di 
