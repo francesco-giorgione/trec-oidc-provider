@@ -119,19 +119,30 @@ const setUpCredentialListener = () => {
     holder.events.on<CredentialStateChangedEvent>(CredentialEventTypes.CredentialStateChanged, async ({ payload }) => {
         console.log('Current state:', payload.credentialRecord.state)
 
-        switch (payload.credentialRecord.state) {
-            case CredentialState.OfferReceived:
-                await holder.credentials.acceptOffer({ credentialRecordId: payload.credentialRecord.id })
-                break
-            case CredentialState.CredentialReceived:
-                console.log('Accepting credentials with record' + payload.credentialRecord.id)
-                await holder.credentials.acceptCredential({credentialRecordId: payload.credentialRecord.id})
-                break
-            case CredentialState.Done:
-                console.log(`Credential for credential id ${payload.credentialRecord.id} is accepted`)
-                process.exit(0)
+        try {
+            switch (payload.credentialRecord.state) {
+                case CredentialState.OfferReceived:
+                    await holder.credentials.acceptOffer({ credentialRecordId: payload.credentialRecord.id })
+                    break
+                case CredentialState.CredentialReceived:
+                    console.log('Accepting credentials with record' + payload.credentialRecord.id)
+                    await holder.credentials.acceptCredential({credentialRecordId: payload.credentialRecord.id})
+                    break
+                case CredentialState.Done:
+                    console.log(`Credential for credential id ${payload.credentialRecord.id} is accepted`)
+                    await delay(1000)
+                    process.exit(0)
+            }
+        } catch(e) {
+            console.log('Connection error!')
+            process.exit(0)
         }
+
     })
+}
+
+function delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 const setupProofRequestListener = () => {
@@ -148,6 +159,13 @@ const setupProofRequestListener = () => {
     })
 }
 
+function startTimer(timeoutMs: number) {
+    setTimeout(() => {
+        console.log("Timeout");
+        process.exit(0);
+    }, timeoutMs);
+}
+
 async function acceptProofRequest(proofRecord: ProofExchangeRecord) {
     try {
         const requestedCredentials = await holder.proofs.selectCredentialsForRequest({
@@ -162,7 +180,7 @@ async function acceptProofRequest(proofRecord: ProofExchangeRecord) {
         console.log('Proof request accepted')
     }
     catch (e) {
-        console.log('Wrong credentials! Declining proof request...\n', e)
+        console.log('Wrong credentials or connection error! Declining proof request...\n', e)
         await holder.proofs.declineRequest({
             proofRecordId: proofRecord.id,
             sendProblemReport: true,
@@ -190,6 +208,7 @@ async function main() {
     rl.question("Inserisci l'url per aprire la connessione\n", async (invitationUrl) => {
         try {
             console.log('Accepting the invitation...');
+            startTimer(15000)
             await receiveInvitation(invitationUrl);
             setUpCredentialListener()
             setupProofRequestListener()

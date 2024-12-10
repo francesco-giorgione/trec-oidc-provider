@@ -100,6 +100,13 @@ const createNewInvitation = async () => {
     }
 }
 
+function startTimer(timeoutMs: number) {
+    setTimeout(() => {
+        console.log("Timeout");
+        process.exit(0);
+    }, timeoutMs);
+}
+
 async function offerCredential(connectionId: string, credentialDefinitionId: string) {
     return issuer.credentials.offerCredential({
         protocolVersion: 'v2',
@@ -132,25 +139,33 @@ const setupConnectionListener = (
         }
 
         if (payload.connectionRecord.state === DidExchangeState.Completed) {
-            const connectionID = payload.connectionRecord.id
+            startTimer(15000)
+        }
+        
+        if (payload.connectionRecord.state === DidExchangeState.Completed) {
+            try {
+                const connectionID = payload.connectionRecord.id
 
-            console.log('Offering credentials...')
-            offerCredential(connectionID, credentialDefinitionID)
+                console.log('Offering credentials...')
+                offerCredential(connectionID, credentialDefinitionID)
 
-            issuer.events.on(CredentialEventTypes.CredentialStateChanged, async ({ payload }) => {
-                // @ts-ignore
-                console.log(payload.credentialRecord.state)
-                // @ts-ignore
-                switch(payload.credentialRecord.state) {
-                    case CredentialState.RequestReceived:
-                        // @ts-ignore
-                        await issuer.credentials.acceptRequest({credentialRecordId: payload.credentialRecord.id})
-                        break
-                    case CredentialState.Done:
-                        console.log('Done')
-                        process.exit(0)
-                }
-            })
+                issuer.events.on(CredentialEventTypes.CredentialStateChanged, async ({ payload }) => {
+                    // @ts-ignore
+                    console.log(payload.credentialRecord.state)
+                    // @ts-ignore
+                    switch(payload.credentialRecord.state) {
+                        case CredentialState.RequestReceived:
+                            // @ts-ignore
+                            await issuer.credentials.acceptRequest({credentialRecordId: payload.credentialRecord.id})
+                            break
+                        case CredentialState.Done:
+                            process.exit(0)
+                    }
+                })
+            } catch (e) {
+                console.log('Connection error!')
+                process.exit(0)
+            }
         }
     })
 }

@@ -139,7 +139,6 @@ export function setupConnectionListener(agent: Agent, oobId: string, objConnId: 
 export function setUpProofDoneListener(agent: Agent, objConnId: any, provider:any, req: any, res: any) {
     agent.events.on<ProofStateChangedEvent>(ProofEventTypes.ProofStateChanged, async ({ payload }) => {
         console.log('current proof state', payload.proofRecord.state)
-
         if(payload.proofRecord.state === ProofState.Done && payload.proofRecord.isVerified &&
                                             payload.proofRecord.connectionId == objConnId.connectionId) {
             

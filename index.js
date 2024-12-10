@@ -149,7 +149,7 @@ verify.getInitializedAgent().then(async agent => {
     app.post('/interaction/:uid/abort', async function (req, res, next) {
         const interactionDetails = await provider.interactionDetails(req, res);
         const { prompt: { name, details }, params, session: { accountId } } = interactionDetails;
-        
+
         try {
             const result = {
                 login: accountId,
