@@ -3,7 +3,9 @@ block content
   head
     script(src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js")
 
-  p#text #{url}
+  body
+    p#text #{url}
+    button#tornaHome(style='display: none') Torna alla home
 
   script.
     (async () => {
@@ -20,13 +22,17 @@ block content
           body: JSON.stringify({oob_id: oobId}),
         });
 
-        if (!response.ok) {
-          throw new Error('Errore nella richiesta: ' + response.statusText);
-        }
-
-        const res = await response.text();
-        document.body.innerHTML = res;
+        document.body.innerHTML = await response.text();
       } catch (error) {
-        console.error('Errore durante la richiesta:', error);
+        console.error('Errore durante la richiesta:', error.message)
+
+        // Il messaggio visualizzato è lo stesso indipendentemente dal tipo di errore verificatosi
+        document.getElementById('text').innerText = 'Si è verificato un errore: la verifica della prova potrebbe ' +
+                'essere fallita'
+
+        document.getElementById('tornaHome').addEventListener('click', function () {
+          window.location.href = 'http://localhost:4200';
+        });
+        document.getElementById('tornaHome').style.display = 'block';
       }
     })();

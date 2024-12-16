@@ -120,7 +120,7 @@ export async function getInvitation(agent: Agent) {
 
         return invitation
     } catch (error) {
-        console.error('Errore:', error);
+        console.error('Error:', error);
     }
 }
 
@@ -138,38 +138,46 @@ export function setupConnectionListener(agent: Agent, oobId: string, objConnId: 
 
 export function setUpProofDoneListener(agent: Agent, objConnId: any, provider:any, req: any, res: any) {
     agent.events.on<ProofStateChangedEvent>(ProofEventTypes.ProofStateChanged, async ({ payload }) => {
-        console.log('current proof state', payload.proofRecord.state)
-        if(payload.proofRecord.state === ProofState.Done && payload.proofRecord.isVerified &&
-                                            payload.proofRecord.connectionId == objConnId.connectionId) {
-            
-            const proofData = await agent.proofs.getFormatData(payload.proofRecord.id);            
+        console.log('Current proof state:', payload.proofRecord.state)
+        
+        if(payload.proofRecord.connectionId == objConnId.connectionId) {
+            const proofData = await agent.proofs.getFormatData(payload.proofRecord.id);
             const presentation = await proofData.presentation
-            // console.log(JSON.stringify(presentation, null, 2));
-
             const attrs = (presentation as any)?.anoncreds.requested_proof.revealed_attrs
-            console.log('revealedAttrs:', attrs)
 
-            const data = {
-                issuerDid: attrs.issuerDid.raw,
-                givenName: attrs.givenName.raw,
-                familyName: attrs.familyName.raw,
-                dateOfBirth: attrs.dateOfBirth.raw,
-                phone: attrs.phone.raw,
-                email: attrs.email.raw,
-                fiscalCode: attrs.fiscalCode.raw,
-                gender: attrs.gender.raw,
+            console.log('Revealed attrs:', attrs)
+            let result = {}
+
+            if(payload.proofRecord.state === ProofState.Done && payload.proofRecord.isVerified) {
+                const data = {
+                    issuerDid: attrs.issuerDid.raw,
+                    givenName: attrs.givenName.raw,
+                    familyName: attrs.familyName.raw,
+                    dateOfBirth: attrs.dateOfBirth.raw,
+                    phone: attrs.phone.raw,
+                    email: attrs.email.raw,
+                    fiscalCode: attrs.fiscalCode.raw,
+                    gender: attrs.gender.raw,
+                }
+
+                result = {
+                    "login": {
+                        accountId: attrs.holderDid.raw,
+                    },
+                };
+
+                req.session.customData = data
+                await provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
             }
-
-            const result = {
-                "login": {
-                    accountId: attrs.holderDid.raw,
-                },
-            };
-            
-            req.session.customData = data
-
-            console.log('sto per fare interactionFinished')
-            await provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
+            else if(payload.proofRecord.state === ProofState.Abandoned) {
+                result = {
+                    login: req.session.accountId,
+                    error: 'access_denied',
+                    error_description: 'Proof declined or not verified',
+                };
+                
+                await provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
+            }
         }
     })
 }

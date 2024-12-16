@@ -140,7 +140,7 @@ verify.getInitializedAgent().then(async agent => {
             }
 
             const result = { "login": {accountId: accountId}, consent };
-            await provider.interactionFinished(req, res, result, { mergeWithLastSubmission: true });
+            await provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
         } catch (err) {
             next(err);
         }
@@ -156,7 +156,7 @@ verify.getInitializedAgent().then(async agent => {
                 error: 'access_denied',
                 error_description: 'End-User aborted interaction',
             };
-            await provider.interactionFinished(req, res, result, { mergeWithLastSubmission: true });
+            await provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
         } catch (err) {
             next(err);
         }
