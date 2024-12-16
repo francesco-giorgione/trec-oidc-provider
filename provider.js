@@ -22,16 +22,16 @@ async function myFindAccount(ctx, accountId) {
 async function getOidcProvider() {
     require('dotenv').config();
     const { Provider } = await import('oidc-provider');
-    const provider = new Provider('https://ssi.dlab.stream', {
+    const provider = new Provider(process.env.PROVIDER_URL, {
         claims: {
             trec: ['trec'],
         },
         clients: [
             {
                 allow_refresh_tokens: true,
-                client_id: process.env.TREC_ID || 'c_24f7d433899443d68ca84ad4913ec53f',
-                client_secret: 'test_secret',
-                redirect_uris: ['http://localhost:4200/auth/aac/callback'],
+                client_id: process.env.TREC_ID,
+                client_secret: process.env.CLIENT_SECRET,
+                redirect_uris: [process.env.TREC_REDIRECT_URI],
                 response_types: ['code'],
                 grant_types: ['authorization_code',],
                 pkce: true,
@@ -39,12 +39,13 @@ async function getOidcProvider() {
             },
         ],
         cookies:  {
-            keys: ['chiave_1_da_modificare', 'chiave_2_da_modificare', 'chiave_3_da_modificare']
+            // Da modificare in produzione
+            keys: [process.env.COOKIES_KEY]
         },
         features: {
-            introspection: { enabled: true },   // da cambiare in true
+            introspection: { enabled: true },
             revocation: { enabled: true },
-            devInteractions: { enabled: false }, // da cambiare in false
+            devInteractions: { enabled: false }, 
         },
         findAccount: myFindAccount,
         interactions: {
@@ -54,6 +55,7 @@ async function getOidcProvider() {
         },
         issueRefreshToken: async (ctx, client, code) => {return true},
         jwks: {
+            // Da modificare in produzione
             keys: [
                 {
                     kty: "RSA",
@@ -73,11 +75,10 @@ async function getOidcProvider() {
             ]
         },
         routes: {
-            authorization: '/auth',
-            token: '/token',
-            userinfo: '/me',
+            authorization: process.env.AUTH_ENDPOINT,
+            token: process.env.TOKEN_ENDPOINT,
         },
-        scopes: ['offline_access openid profile email profile.trec.me'],
+        scopes: [process.env.SCOPES],
         ttl: {
             AccessToken:    15,
             IdToken:        3600,

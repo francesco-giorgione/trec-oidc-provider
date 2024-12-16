@@ -12,7 +12,8 @@ block content
       try {
         const oobId = '#{oob_id}'
         const uid = '#{u_id}'
-        const url = `http://localhost:5000/interaction/${uid}/login`;
+        const serverPort = '#{port}'
+        const url = `http://localhost:${serverPort}/interaction/${uid}/login`;
 
         const response = await fetch(url, {
           method: 'POST',
@@ -31,7 +32,8 @@ block content
                 'essere fallita'
 
         document.getElementById('tornaHome').addEventListener('click', function () {
-          window.location.href = 'http://localhost:4200';
+          const origin = '#{cors_origin}'
+          window.location.href = `http://localhost:${origin}`;
         });
         document.getElementById('tornaHome').style.display = 'block';
       }

@@ -151,7 +151,6 @@ export function setupConnectionListener(agent: Agent, oobId: string, objConnId: 
                     }, 30000)
 
                     // Fai partire il timer
-                    console.log('faccio partire il timer')
                     connTimeoutDict[connectionId] = [timerId, false]
                     objConnId.connectionId = connectionId
                 }
@@ -160,10 +159,8 @@ export function setupConnectionListener(agent: Agent, oobId: string, objConnId: 
                     // Se il timer non è scaduto
                     if(!connTimeoutDict[connectionId][1]) {
                         // Ferma il timer
-                        console.log('ho fermato il timer')
                         clearTimeout(connTimeoutDict[connectionId][0])
 
-                        console.log('mando la proof request')
                         delete connTimeoutDict[connectionId]
                         await sendProofRequest(agent, connectionId)
                     }
@@ -198,14 +195,12 @@ export function setUpProofDoneListener(agent: Agent, objConnId: any, provider:an
                     }, 30000)
 
                     // Fai partire il timer
-                    console.log('faccio partire il proof timer')
                     proofTimeoutDict[proofId] = [timerId, false]
                 }
                 else if(payload.proofRecord.state === ProofState.Done && payload.proofRecord.isVerified) {
                     // Se il timer non è scaduto
                     if(!proofTimeoutDict[proofId][1]) {
                         // Ferma il timer
-                        console.log('ho fermato il timer')
                         clearTimeout(proofTimeoutDict[proofId][0])
 
                         const data = {

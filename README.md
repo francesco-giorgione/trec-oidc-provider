@@ -60,6 +60,7 @@ c) modificare i seguenti ulteriori parametri di sicurezza (opzionale per l'avvio
 |-----------------------|-------------|
 | provider.cookies.keys | provider.js |
 | provider.jwks.keys    | provider.js |
+| cookie.secure         | index.js    |
 
 d) nel file **verification/verifier.ts**, modificare il valore di _const credentialDefinitionId_ (riga 269)
 con l'id delle credenziali generate in fase di setup dell'issuer;

@@ -20,38 +20,37 @@ function setApp() {
     app.use(bodyParser.urlencoded({extended: true}));
     app.use(cookieParser());
     app.use(cors({
-        origin: 'http://localhost:4200',
+        origin: process.env.CORS_ORIGIN,
         methods: ['GET', 'POST', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
     }));
-
-    require('dotenv').config();
-
+    
     app.use(session({
         secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
-        cookie: { secure: false } // Imposta su true in produzione da_modificare
+        cookie: { secure: false } // Da modificare in true in produzione
     }));
 
     app.set('view engine', 'pug');
     app.set('views', path.join(__dirname, 'views'));
 
-    app.listen(5000, () => {
-        console.log('OIDC Provider executing on http://localhost:5000');
+    app.listen(process.env.PORT, () => {
+        console.log('OIDC Provider executing on http://localhost:' + process.env.PORT);
     });
 
     return app;
 }
 
+require('dotenv').config();
 verify.getInitializedAgent().then(async agent => {
     const app = setApp();
     app.locals.agent = agent;
     app.locals.connTimeoutDict = {}
     app.locals.proofTimeoutDict = {}
 
-    const didID = process.env.DID_ID || 'CHANGE_YOUR_DID_ID'
+    const didID = process.env.DID_ID
 
     // Uncomment only at first execution
     // console.log('Creating the DID...')
@@ -76,7 +75,8 @@ verify.getInitializedAgent().then(async agent => {
                     const invitationUrl = result.invitationUrl
                     const oobId = result.oob.id
 
-                    return res.render('login', {url: invitationUrl, oob_id: oobId, u_id: uid})
+                    return res.render('login', {url: invitationUrl, oob_id: oobId, u_id: uid, port: process.env.PORT,
+                        cors_origin: process.env.CORS_ORIGIN})
                 }
                 case 'consent': {
                     return res.render('interaction', {
