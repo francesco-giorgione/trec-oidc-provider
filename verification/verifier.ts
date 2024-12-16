@@ -36,12 +36,12 @@ import {
 import {anoncreds} from '@hyperledger/anoncreds-nodejs';
 
 const verifierConfig = {
-    label: 'verifier_sec',
+    label: process.env.VERIFIER_LABEL || 'verifier-label',
     walletConfig: {
-        id: 'verifier_sec',
-        key: process.env.WALLET_KEY || 'CHANGE_YOUR_WALLET_KEY',
+        id: process.env.VERIFIER_WALLET_ID || 'verifier-wallet-id',
+        key: process.env.VERIFIER_WALLET_KEY || 'verifier-wallet-key',
     },
-    endpoints: ['http://localhost:3003'],
+    endpoints: [(process.env.VERIFIER_ENDPOINT || 'http://localhost:3003')],
     // logger: new ConsoleLogger(LogLevel.debug)
 };
 
@@ -242,6 +242,7 @@ export function setUpProofDoneListener(agent: Agent, objConnId: any, provider:an
 }
 
 export async function sendProofRequest(agent: Agent, connectionRecordId: string) {
+    const credentialDefinitionId = process.env.CREDENTIAL_DEFINITION_ID || 'credential-definition-id'
     console.log('Requesting proof...')
 
     const proofAttribute = {
@@ -332,6 +333,6 @@ export async function sendProofRequest(agent: Agent, connectionRecordId: string)
     })
 }
 
-const credentialDefinitionId = 'did:cheqd:testnet:87874297-d824-40ea-8ae5-364a1ec90101/resources/dfde04c2-eeca-4cd5-8ff8-36cb028dd198'
+// const credentialDefinitionId = 'did:cheqd:testnet:87874297-d824-40ea-8ae5-364a1ec90101/resources/dfde04c2-eeca-4cd5-8ff8-36cb028dd198'
 
 

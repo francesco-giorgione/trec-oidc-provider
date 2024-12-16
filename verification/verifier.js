@@ -23,12 +23,12 @@ const aries_askar_nodejs_1 = require("@hyperledger/aries-askar-nodejs");
 const anoncreds_1 = require("@credo-ts/anoncreds");
 const anoncreds_nodejs_1 = require("@hyperledger/anoncreds-nodejs");
 const verifierConfig = {
-    label: 'verifier_sec',
+    label: process.env.VERIFIER_LABEL || 'verifier-label',
     walletConfig: {
-        id: 'verifier_sec',
-        key: process.env.WALLET_KEY || 'CHANGE_YOUR_WALLET_KEY',
+        id: process.env.VERIFIER_WALLET_ID || 'verifier-wallet-id',
+        key: process.env.VERIFIER_WALLET_KEY || 'verifier-wallet-key',
     },
-    endpoints: ['http://localhost:3003'],
+    endpoints: [(process.env.VERIFIER_ENDPOINT || 'http://localhost:3003')],
     // logger: new ConsoleLogger(LogLevel.debug)
 };
 exports.verifier = new core_1.Agent({
@@ -133,7 +133,6 @@ function setupConnectionListener(agent, oobId, objConnId, provider, req, res, co
                         });
                     }, 30000);
                     // Fai partire il timer
-                    console.log('faccio partire il timer');
                     connTimeoutDict[connectionId] = [timerId, false];
                     objConnId.connectionId = connectionId;
                 }
@@ -141,9 +140,7 @@ function setupConnectionListener(agent, oobId, objConnId, provider, req, res, co
                     // Se il timer non è scaduto
                     if (!connTimeoutDict[connectionId][1]) {
                         // Ferma il timer
-                        console.log('ho fermato il timer');
                         clearTimeout(connTimeoutDict[connectionId][0]);
-                        console.log('mando la proof request');
                         delete connTimeoutDict[connectionId];
                         yield sendProofRequest(agent, connectionId);
                     }
@@ -175,14 +172,12 @@ function setUpProofDoneListener(agent, objConnId, provider, req, res, proofTimeo
                         });
                     }, 30000);
                     // Fai partire il timer
-                    console.log('faccio partire il proof timer');
                     proofTimeoutDict[proofId] = [timerId, false];
                 }
                 else if (payload.proofRecord.state === core_1.ProofState.Done && payload.proofRecord.isVerified) {
                     // Se il timer non è scaduto
                     if (!proofTimeoutDict[proofId][1]) {
                         // Ferma il timer
-                        console.log('ho fermato il timer');
                         clearTimeout(proofTimeoutDict[proofId][0]);
                         const data = {
                             issuerDid: attrs.issuerDid.raw,
@@ -221,6 +216,7 @@ function setUpProofDoneListener(agent, objConnId, provider, req, res, proofTimeo
 }
 function sendProofRequest(agent, connectionRecordId) {
     return __awaiter(this, void 0, void 0, function* () {
+        const credentialDefinitionId = process.env.CREDENTIAL_DEFINITION_ID || 'credential-definition-id';
         console.log('Requesting proof...');
         const proofAttribute = {
             issuerDid: {
@@ -309,4 +305,4 @@ function sendProofRequest(agent, connectionRecordId) {
         });
     });
 }
-const credentialDefinitionId = 'did:cheqd:testnet:87874297-d824-40ea-8ae5-364a1ec90101/resources/dfde04c2-eeca-4cd5-8ff8-36cb028dd198';
+// const credentialDefinitionId = 'did:cheqd:testnet:87874297-d824-40ea-8ae5-364a1ec90101/resources/dfde04c2-eeca-4cd5-8ff8-36cb028dd198'
