@@ -124,60 +124,120 @@ export async function getInvitation(agent: Agent) {
     }
 }
 
-export function setupConnectionListener(agent: Agent, oobId: string, objConnId: any) {
-    agent.events.on<ConnectionStateChangedEvent>(ConnectionEventTypes.ConnectionStateChanged, async ({ payload }) => {
-        if (payload.connectionRecord.state === DidExchangeState.Completed &&
-                                                    payload.connectionRecord.outOfBandId == oobId) {
+async function abort(provider: any, req: any, res: any, connTimeoutDict: any, connectionId: string, connection: boolean) {
+    const description = connection ? 'opening connection' : 'exchanging proof'
+    
+    const result = {
+        error: 'time_elapsed',
+        error_description: 'Time for ' + description + ' elapsed'
+    };
+    delete connTimeoutDict[connectionId]
+    await provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
+}
 
-            const connectionID = payload.connectionRecord.id
-            objConnId.connectionId = connectionID
-            await sendProofRequest(agent, connectionID)
+export function setupConnectionListener(agent: Agent, oobId: string, objConnId: any, provider: any, req: any, res: any,
+                                        connTimeoutDict: any) {
+    agent.events.on<ConnectionStateChangedEvent>(ConnectionEventTypes.ConnectionStateChanged, async ({ payload }) => {
+        console.log('Current connection state: ', payload.connectionRecord.state)
+        const connectionId = payload.connectionRecord.id
+        
+        try {            
+            if(payload.connectionRecord.outOfBandId == oobId) {
+                if(payload.connectionRecord.state === DidExchangeState.RequestReceived) {
+                    const timerId = setTimeout(async function() {
+                        console.log('[Connection', connectionId, '] Timeout')
+                        connTimeoutDict[connectionId][1] = true;
+                        await abort(provider, req, res, connTimeoutDict, connectionId, true)
+                    }, 30000)
+
+                    // Fai partire il timer
+                    console.log('faccio partire il timer')
+                    connTimeoutDict[connectionId] = [timerId, false]
+                    objConnId.connectionId = connectionId
+                }
+
+                if (payload.connectionRecord.state === DidExchangeState.Completed) {
+                    // Se il timer non è scaduto
+                    if(!connTimeoutDict[connectionId][1]) {
+                        // Ferma il timer
+                        console.log('ho fermato il timer')
+                        clearTimeout(connTimeoutDict[connectionId][0])
+
+                        console.log('mando la proof request')
+                        delete connTimeoutDict[connectionId]
+                        await sendProofRequest(agent, connectionId)
+                    }
+                    else {
+                        console.log('timer scaduto')
+                    }
+                }
+            }
+        } catch(e) {
+            console.log('[Connection', connectionId, '] Error')
+            await abort(provider, req, res, connTimeoutDict, connectionId, true)
         }
     })
 }
 
-export function setUpProofDoneListener(agent: Agent, objConnId: any, provider:any, req: any, res: any) {
+export function setUpProofDoneListener(agent: Agent, objConnId: any, provider:any, req: any, res: any, 
+                                       proofTimeoutDict: any) {
     agent.events.on<ProofStateChangedEvent>(ProofEventTypes.ProofStateChanged, async ({ payload }) => {
         console.log('Current proof state:', payload.proofRecord.state)
+        const proofId = payload.proofRecord.id;
         
-        if(payload.proofRecord.connectionId == objConnId.connectionId) {
-            const proofData = await agent.proofs.getFormatData(payload.proofRecord.id);
-            const presentation = await proofData.presentation
-            const attrs = (presentation as any)?.anoncreds.requested_proof.revealed_attrs
+        try {
+            if(payload.proofRecord.connectionId == objConnId.connectionId) {
+                const proofData = await agent.proofs.getFormatData(proofId);
+                const presentation = await proofData.presentation
+                const attrs = (presentation as any)?.anoncreds.requested_proof.revealed_attrs
 
-            console.log('Revealed attrs:', attrs)
-            let result = {}
+                let result = {}
 
-            if(payload.proofRecord.state === ProofState.Done && payload.proofRecord.isVerified) {
-                const data = {
-                    issuerDid: attrs.issuerDid.raw,
-                    givenName: attrs.givenName.raw,
-                    familyName: attrs.familyName.raw,
-                    dateOfBirth: attrs.dateOfBirth.raw,
-                    phone: attrs.phone.raw,
-                    email: attrs.email.raw,
-                    fiscalCode: attrs.fiscalCode.raw,
-                    gender: attrs.gender.raw,
+                if(payload.proofRecord.state === ProofState.RequestSent) {
+                    const timerId = setTimeout(async function() {
+                        console.log('[Proof record', proofId + '] Timeout')
+                        proofTimeoutDict[proofId][1] = true;
+                        await abort(provider, req, res, proofTimeoutDict, proofId, false)
+                    }, 30000)
+
+                    // Fai partire il timer
+                    console.log('faccio partire il proof timer')
+                    proofTimeoutDict[proofId] = [timerId, false]
                 }
+                else if(payload.proofRecord.state === ProofState.Done && payload.proofRecord.isVerified) {
+                    const data = {
+                        issuerDid: attrs.issuerDid.raw,
+                        givenName: attrs.givenName.raw,
+                        familyName: attrs.familyName.raw,
+                        dateOfBirth: attrs.dateOfBirth.raw,
+                        phone: attrs.phone.raw,
+                        email: attrs.email.raw,
+                        fiscalCode: attrs.fiscalCode.raw,
+                        gender: attrs.gender.raw,
+                    }
 
-                result = {
-                    "login": {
-                        accountId: attrs.holderDid.raw,
-                    },
-                };
+                    result = {
+                        "login": {
+                            accountId: attrs.holderDid.raw,
+                        },
+                    };
 
-                req.session.customData = data
-                await provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
+                    req.session.customData = data
+                    await provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
+                }
+                else if(payload.proofRecord.state === ProofState.Abandoned) {
+                    result = {
+                        login: req.session.accountId,
+                        error: 'access_denied',
+                        error_description: 'Proof declined or not verified',
+                    };
+
+                    await provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
+                }
             }
-            else if(payload.proofRecord.state === ProofState.Abandoned) {
-                result = {
-                    login: req.session.accountId,
-                    error: 'access_denied',
-                    error_description: 'Proof declined or not verified',
-                };
-                
-                await provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
-            }
+        } catch (e) {
+            console.log('[Proof record', proofId, '] Error')
+            await abort(provider, req, res, proofTimeoutDict, proofId, true)
         }
     })
 }
@@ -252,6 +312,14 @@ export async function sendProofRequest(agent: Agent, connectionRecordId: string)
         },
         gender: {
             name: 'gender',
+            restrictions: [
+                {
+                    cred_def_id: credentialDefinitionId
+                },
+            ],
+        },
+        error: {
+            name: 'error',
             restrictions: [
                 {
                     cred_def_id: credentialDefinitionId

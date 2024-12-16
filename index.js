@@ -48,6 +48,8 @@ function setApp() {
 verify.getInitializedAgent().then(async agent => {
     const app = setApp();
     app.locals.agent = agent;
+    app.locals.connTimeoutDict = {}
+    app.locals.proofTimeoutDict = {}
 
     const didID = process.env.DID_ID || 'CHANGE_YOUR_DID_ID'
 
@@ -97,8 +99,8 @@ verify.getInitializedAgent().then(async agent => {
         const oobId = req.body.oob_id
         const objConnId = {}
 
-        verify.setupConnectionListener(req.app.locals.agent, oobId, objConnId);
-        verify.setUpProofDoneListener(req.app.locals.agent, objConnId, provider, req, res);
+        verify.setupConnectionListener(req.app.locals.agent, oobId, objConnId, provider, req, res, app.locals.connTimeoutDict);
+        verify.setUpProofDoneListener(req.app.locals.agent, objConnId, provider, req, res, app.locals.proofTimeoutDict);
     });
 
     app.post('/interaction/:uid/confirm', setNoCache, async (req, res, next) => {

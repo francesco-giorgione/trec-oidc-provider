@@ -71,6 +71,12 @@ const createNewInvitation = () => __awaiter(void 0, void 0, void 0, function* ()
         invitationUrl: outOfBandRecord.outOfBandInvitation.toUrl({ domain: 'http://localhost:3001' }),
     };
 });
+function startTimer(timeoutMs) {
+    setTimeout(() => {
+        console.log("Timeout");
+        process.exit(0);
+    }, timeoutMs);
+}
 function offerCredential(connectionId, credentialDefinitionId) {
     return __awaiter(this, void 0, void 0, function* () {
         return issuer.credentials.offerCredential({
@@ -101,23 +107,31 @@ const setupConnectionListener = (outOfBandRecord) => {
             return;
         }
         if (payload.connectionRecord.state === core_1.DidExchangeState.Completed) {
-            const connectionID = payload.connectionRecord.id;
-            console.log('Offering credentials...');
-            offerCredential(connectionID, credentialDefinitionID);
-            issuer.events.on(core_1.CredentialEventTypes.CredentialStateChanged, (_a) => __awaiter(void 0, [_a], void 0, function* ({ payload }) {
-                // @ts-ignore
-                console.log(payload.credentialRecord.state);
-                // @ts-ignore
-                switch (payload.credentialRecord.state) {
-                    case core_1.CredentialState.RequestReceived:
-                        // @ts-ignore
-                        yield issuer.credentials.acceptRequest({ credentialRecordId: payload.credentialRecord.id });
-                        break;
-                    case core_1.CredentialState.Done:
-                        console.log('Done');
-                        process.exit(0);
-                }
-            }));
+            startTimer(15000);
+        }
+        if (payload.connectionRecord.state === core_1.DidExchangeState.Completed) {
+            try {
+                const connectionID = payload.connectionRecord.id;
+                console.log('Offering credentials...');
+                offerCredential(connectionID, credentialDefinitionID);
+                issuer.events.on(core_1.CredentialEventTypes.CredentialStateChanged, (_a) => __awaiter(void 0, [_a], void 0, function* ({ payload }) {
+                    // @ts-ignore
+                    console.log(payload.credentialRecord.state);
+                    // @ts-ignore
+                    switch (payload.credentialRecord.state) {
+                        case core_1.CredentialState.RequestReceived:
+                            // @ts-ignore
+                            yield issuer.credentials.acceptRequest({ credentialRecordId: payload.credentialRecord.id });
+                            break;
+                        case core_1.CredentialState.Done:
+                            process.exit(0);
+                    }
+                }));
+            }
+            catch (e) {
+                console.log('Connection error!');
+                process.exit(0);
+            }
         }
     });
 };
