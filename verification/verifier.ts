@@ -167,9 +167,6 @@ export function setupConnectionListener(agent: Agent, oobId: string, objConnId: 
                         delete connTimeoutDict[connectionId]
                         await sendProofRequest(agent, connectionId)
                     }
-                    else {
-                        console.log('timer scaduto')
-                    }
                 }
             }
         } catch(e) {
@@ -205,25 +202,32 @@ export function setUpProofDoneListener(agent: Agent, objConnId: any, provider:an
                     proofTimeoutDict[proofId] = [timerId, false]
                 }
                 else if(payload.proofRecord.state === ProofState.Done && payload.proofRecord.isVerified) {
-                    const data = {
-                        issuerDid: attrs.issuerDid.raw,
-                        givenName: attrs.givenName.raw,
-                        familyName: attrs.familyName.raw,
-                        dateOfBirth: attrs.dateOfBirth.raw,
-                        phone: attrs.phone.raw,
-                        email: attrs.email.raw,
-                        fiscalCode: attrs.fiscalCode.raw,
-                        gender: attrs.gender.raw,
+                    // Se il timer non è scaduto
+                    if(!proofTimeoutDict[proofId][1]) {
+                        // Ferma il timer
+                        console.log('ho fermato il timer')
+                        clearTimeout(proofTimeoutDict[proofId][0])
+
+                        const data = {
+                            issuerDid: attrs.issuerDid.raw,
+                            givenName: attrs.givenName.raw,
+                            familyName: attrs.familyName.raw,
+                            dateOfBirth: attrs.dateOfBirth.raw,
+                            phone: attrs.phone.raw,
+                            email: attrs.email.raw,
+                            fiscalCode: attrs.fiscalCode.raw,
+                            gender: attrs.gender.raw,
+                        }
+
+                        result = {
+                            "login": {
+                                accountId: attrs.holderDid.raw,
+                            },
+                        };
+
+                        req.session.customData = data
+                        await provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
                     }
-
-                    result = {
-                        "login": {
-                            accountId: attrs.holderDid.raw,
-                        },
-                    };
-
-                    req.session.customData = data
-                    await provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
                 }
                 else if(payload.proofRecord.state === ProofState.Abandoned) {
                     result = {
@@ -312,14 +316,6 @@ export async function sendProofRequest(agent: Agent, connectionRecordId: string)
         },
         gender: {
             name: 'gender',
-            restrictions: [
-                {
-                    cred_def_id: credentialDefinitionId
-                },
-            ],
-        },
-        error: {
-            name: 'error',
             restrictions: [
                 {
                     cred_def_id: credentialDefinitionId

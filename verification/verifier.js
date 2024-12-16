@@ -147,9 +147,6 @@ function setupConnectionListener(agent, oobId, objConnId, provider, req, res, co
                         delete connTimeoutDict[connectionId];
                         yield sendProofRequest(agent, connectionId);
                     }
-                    else {
-                        console.log('timer scaduto');
-                    }
                 }
             }
         }
@@ -182,23 +179,29 @@ function setUpProofDoneListener(agent, objConnId, provider, req, res, proofTimeo
                     proofTimeoutDict[proofId] = [timerId, false];
                 }
                 else if (payload.proofRecord.state === core_1.ProofState.Done && payload.proofRecord.isVerified) {
-                    const data = {
-                        issuerDid: attrs.issuerDid.raw,
-                        givenName: attrs.givenName.raw,
-                        familyName: attrs.familyName.raw,
-                        dateOfBirth: attrs.dateOfBirth.raw,
-                        phone: attrs.phone.raw,
-                        email: attrs.email.raw,
-                        fiscalCode: attrs.fiscalCode.raw,
-                        gender: attrs.gender.raw,
-                    };
-                    result = {
-                        "login": {
-                            accountId: attrs.holderDid.raw,
-                        },
-                    };
-                    req.session.customData = data;
-                    yield provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
+                    // Se il timer non è scaduto
+                    if (!proofTimeoutDict[proofId][1]) {
+                        // Ferma il timer
+                        console.log('ho fermato il timer');
+                        clearTimeout(proofTimeoutDict[proofId][0]);
+                        const data = {
+                            issuerDid: attrs.issuerDid.raw,
+                            givenName: attrs.givenName.raw,
+                            familyName: attrs.familyName.raw,
+                            dateOfBirth: attrs.dateOfBirth.raw,
+                            phone: attrs.phone.raw,
+                            email: attrs.email.raw,
+                            fiscalCode: attrs.fiscalCode.raw,
+                            gender: attrs.gender.raw,
+                        };
+                        result = {
+                            "login": {
+                                accountId: attrs.holderDid.raw,
+                            },
+                        };
+                        req.session.customData = data;
+                        yield provider.interactionFinished(req, res, result, { mergeWithLastSubmission: false });
+                    }
                 }
                 else if (payload.proofRecord.state === core_1.ProofState.Abandoned) {
                     result = {
@@ -286,14 +289,6 @@ function sendProofRequest(agent, connectionRecordId) {
             },
             gender: {
                 name: 'gender',
-                restrictions: [
-                    {
-                        cred_def_id: credentialDefinitionId
-                    },
-                ],
-            },
-            error: {
-                name: 'error',
                 restrictions: [
                     {
                         cred_def_id: credentialDefinitionId
