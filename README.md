@@ -42,7 +42,7 @@ a) Assegnare valori significativi alle variabili di ambiente contenute nel file 
 
 `SESSION_SECRET`: chiave utilizzata per la cifratura dei cookie di sessione
 
-`DID_ID`: ID del DID che si vuole creare per l'agente (deve essere della forma **cheqd:<testnet-or-mainnet>:92874297-d824-40ea-8ae5-364a1ec90063**,
+`DID_ID`: ID del DID che si vuole creare per l'agente (deve essere della forma cheqd:**\[mainnet _or_ testnet\]**:92874297-d824-40ea-8ae5-364a1ec90063,
     le cifre dopo **testnet/mainnet:** possono essere fissate in modo arbitario, ma devono essere univoche)
 
 `TREC_ID`: ID dell'app client; la mia implementazione utilizza **c_24f7d433899443d68ca84ad4913ec53f** (concordato con FBK)
