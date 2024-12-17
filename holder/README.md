@@ -26,23 +26,23 @@ b) Assegnare valori significativi alle variabili di ambiente contenute nel file 
 
 `HOLDER_PORT`: porta dell'holder
 
-c) Installare le dipendenze del progetto;
+c) Installare le dipendenze del progetto.
 ```
     npm install
 ```
 
-d) nel file **src/holder.ts**, decommentare il codice delle righe 203-209 e commentare il codice
-delle righe 212-222;
+d) Nel file **src/holder.ts**, decommentare il codice delle righe 203-209 e commentare il codice
+delle righe 212-222.
 
-e) eseguire il comando di avvio per la creazione del DID;
+e) Eseguire il comando di avvio per la creazione del DID.
 ```
     npx tsx src/holder.ts
 ```
 
-f) nel file **src/holder.ts**, commentare il codice delle righe 203-209 e decommentare il codice
-delle righe 212-222;
+f) Nel file **src/holder.ts**, commentare il codice delle righe 203-209 e decommentare il codice
+delle righe 212-222.
 
-g) eseguire nuovamente il comando di avvio: l'holder è ora pronto per interagire con gli altri agenti tramite i link di 
+g) Eseguire nuovamente il comando di avvio: l'holder è ora pronto per interagire con gli altri agenti tramite i link di 
 invito.
 ```
     npx tsx src/holder.ts
