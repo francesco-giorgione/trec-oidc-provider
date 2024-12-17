@@ -51,16 +51,18 @@ const rl = readline.createInterface({
 require('dotenv').config();
 
 const holderConfig = {
-    label: 'holder_sec',
+    label: process.env.HOLDER_LABEL,
     walletConfig: {
-        id: 'holder_sec',
-        key: process.env.WALLET_KEY || 'CHANGE_YOUR_WALLET_KEY'
+        id: process.env.HOLDER_WALLET_ID,
+        key: process.env.WALLET_KEY
     },
-    endpoints: ['http://localhost:3002'],
+    endpoints: [process.env.HOLDER_ENDPOINT],
     // logger: new ConsoleLogger(LogLevel.debug)
 };
 
+
 const holder = new Agent({
+    // @ts-ignore
     config: holderConfig,
     dependencies: agentDependencies,
     modules: {
@@ -74,8 +76,9 @@ const holder = new Agent({
             new CheqdModuleConfig({
                 networks: [
                     {
-                        network: 'testnet',
-                        cosmosPayerSeed: 'grab onion alien short practice pyramid where demise napkin phrase ill pitch',
+                        // @ts-ignore
+                        network: process.env.CHEQD_NETWORK,
+                        cosmosPayerSeed: process.env.HOLDER_COSMOS_SEED,
                     },
                 ],
             })
@@ -108,7 +111,8 @@ const holder = new Agent({
 
 holder.registerOutboundTransport(new WsOutboundTransport())
 holder.registerOutboundTransport(new HttpOutboundTransport())
-holder.registerInboundTransport(new HttpInboundTransport({ port: 3002 }))
+// @ts-ignore
+holder.registerInboundTransport(new HttpInboundTransport({ port: process.env.HOLDER_PORT }))
 
 const receiveInvitation = async (invitationUrl: string) => {
     const { outOfBandRecord } = await holder.oob.receiveInvitationFromUrl(invitationUrl)
@@ -153,7 +157,7 @@ const setupProofRequestListener = () => {
             console.log('Trying to accept proof request...')
             await acceptProofRequest(payload.proofRecord)
         }
-        else if(payload.proofRecord.state === ProofState.Done) {
+        else if(payload.proofRecord.state === ProofState.Done || payload.proofRecord.state === ProofState.Declined) {
             process.exit(0)
         }
     })
@@ -189,7 +193,7 @@ async function acceptProofRequest(proofRecord: ProofExchangeRecord) {
     }
 }
 
-const didID = process.env.DID_ID || 'CHANGE_YOUR_DID_ID'
+const didID = process.env.DID_ID
 
 async function main() {
     console.log('Initializing holder agent...')
@@ -200,7 +204,7 @@ async function main() {
     //     console.log('Creating the DID...')
     //     await once.createDid(holder, didID).then(r => {})
     //     process.exit(0)
-    // } catch (error) {
+
     //     console.error('Errore:', error);
     // }
 
