@@ -33,7 +33,7 @@ Sono richieste le seguenti dipendenze
 - `node` versione 18.x
 
 ## Provider OIDC
-Per avviare il server, è necessario eseguire le operazion seguenti
+Per avviare il server, è necessario eseguire le operazioni seguenti
 
 a) Assegnare valori significativi alle variabili di ambiente contenute nel file `.env` della path principale del progetto.
 
