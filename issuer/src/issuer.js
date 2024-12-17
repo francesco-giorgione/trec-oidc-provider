@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -16,17 +39,19 @@ const aries_askar_nodejs_1 = require("@hyperledger/aries-askar-nodejs");
 const anoncreds_1 = require("@credo-ts/anoncreds");
 const anoncreds_nodejs_1 = require("@hyperledger/anoncreds-nodejs");
 const cheqd_1 = require("@credo-ts/cheqd");
+const process = __importStar(require("process"));
 require('dotenv').config();
 const issuerConfig = {
-    label: 'issuer5_sec',
+    label: process.env.ISSUER_LABEL,
     walletConfig: {
-        id: 'issuer5_sec',
-        key: process.env.WALLET_KEY || 'CHANGE_YOUR_WALLET_KEY'
+        id: process.env.ISSUER_WALLET_ID,
+        key: process.env.ISSUER_WALLET_KEY
     },
-    endpoints: ['http://localhost:3001'],
+    endpoints: [process.env.ISSUER_ENDPOINT],
     // logger: new ConsoleLogger(LogLevel.debug)
 };
 const issuer = new core_1.Agent({
+    // @ts-ignore
     config: issuerConfig,
     dependencies: node_1.agentDependencies,
     modules: {
@@ -43,8 +68,10 @@ const issuer = new core_1.Agent({
         cheqd: new cheqd_1.CheqdModule(new cheqd_1.CheqdModuleConfig({
             networks: [
                 {
-                    network: 'testnet',
-                    cosmosPayerSeed: 'grab onion alien short practice pyramid where demise napkin phrase ill pitch'
+                    // @ts-ignore
+                    network: process.env.CHEQD_NETWORK,
+                    // @ts-ignore
+                    cosmosPayerSeed: process.env.ISSUER_COSMOS_SEED
                 },
             ],
         })),
@@ -63,12 +90,14 @@ const issuer = new core_1.Agent({
 });
 issuer.registerOutboundTransport(new core_1.WsOutboundTransport());
 issuer.registerOutboundTransport(new core_1.HttpOutboundTransport());
-issuer.registerInboundTransport(new node_1.HttpInboundTransport({ port: 3001 }));
+// @ts-ignore
+issuer.registerInboundTransport(new node_1.HttpInboundTransport({ port: process.env.ISSUER_PORT }));
 const createNewInvitation = () => __awaiter(void 0, void 0, void 0, function* () {
     const outOfBandRecord = yield issuer.oob.createInvitation();
     return {
         outOfBandRecord,
-        invitationUrl: outOfBandRecord.outOfBandInvitation.toUrl({ domain: 'http://localhost:3001' }),
+        // @ts-ignore
+        invitationUrl: outOfBandRecord.outOfBandInvitation.toUrl({ domain: process.env.ISSUER_URL }),
     };
 });
 function startTimer(timeoutMs) {
@@ -136,10 +165,10 @@ const setupConnectionListener = (outOfBandRecord) => {
     });
 };
 var credentialDefinitionID;
-const didID = process.env.DID_ID || 'CHANGE_YOUR_DID_ID';
+const didID = process.env.DID_ID;
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        credentialDefinitionID = 'did:cheqd:testnet:87874297-d824-40ea-8ae5-364a1ec90101/resources/dfde04c2-eeca-4cd5-8ff8-36cb028dd198';
+        credentialDefinitionID = process.env.CREDENTIAL_DEFINITION_ID || 'value-unused-at-begin';
         try {
             console.log('Initializing issuer agent...');
             yield issuer.initialize();

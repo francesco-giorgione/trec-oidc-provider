@@ -36,20 +36,23 @@ import {
     CheqdDidCreateOptions
 } from '@credo-ts/cheqd';
 import * as once from "./once";
+import * as process from "process";
 
 require('dotenv').config();
 
 const issuerConfig = {
-    label: 'issuer5_sec',
+    label: process.env.ISSUER_LABEL,
     walletConfig: {
-        id: 'issuer5_sec',
-        key: process.env.WALLET_KEY || 'CHANGE_YOUR_WALLET_KEY'
+        id: process.env.ISSUER_WALLET_ID,
+        key: process.env.ISSUER_WALLET_KEY
     },
-    endpoints: ['http://localhost:3001'],
+    endpoints: [process.env.ISSUER_ENDPOINT],
     // logger: new ConsoleLogger(LogLevel.debug)
 };
 
+
 const issuer = new Agent({
+    // @ts-ignore
     config: issuerConfig,
     dependencies: agentDependencies,
     modules: {
@@ -67,8 +70,10 @@ const issuer = new Agent({
             new CheqdModuleConfig({
                 networks: [
                     {
-                        network: 'testnet',
-                        cosmosPayerSeed: 'grab onion alien short practice pyramid where demise napkin phrase ill pitch'
+                        // @ts-ignore
+                        network: process.env.CHEQD_NETWORK,
+                        // @ts-ignore
+                        cosmosPayerSeed: process.env.ISSUER_COSMOS_SEED
                     },
                 ],
             })
@@ -89,14 +94,16 @@ const issuer = new Agent({
 
 issuer.registerOutboundTransport(new WsOutboundTransport())
 issuer.registerOutboundTransport(new HttpOutboundTransport())
-issuer.registerInboundTransport(new HttpInboundTransport({ port: 3001 }))
+// @ts-ignore
+issuer.registerInboundTransport(new HttpInboundTransport({ port: process.env.ISSUER_PORT }))
 
 const createNewInvitation = async () => {
     const outOfBandRecord = await issuer.oob.createInvitation()
 
     return {
         outOfBandRecord,
-        invitationUrl: outOfBandRecord.outOfBandInvitation.toUrl({ domain: 'http://localhost:3001' }),
+        // @ts-ignore
+        invitationUrl: outOfBandRecord.outOfBandInvitation.toUrl({ domain: process.env.ISSUER_URL }),
     }
 }
 
@@ -132,7 +139,7 @@ async function offerCredential(connectionId: string, credentialDefinitionId: str
 
 const setupConnectionListener = (
     outOfBandRecord: OutOfBandRecord,
-    ) => {
+) => {
     issuer.events.on<ConnectionStateChangedEvent>(ConnectionEventTypes.ConnectionStateChanged, ({ payload }) => {
         if (payload.connectionRecord.outOfBandId !== outOfBandRecord.id) {
             return
@@ -141,7 +148,7 @@ const setupConnectionListener = (
         if (payload.connectionRecord.state === DidExchangeState.Completed) {
             startTimer(15000)
         }
-        
+
         if (payload.connectionRecord.state === DidExchangeState.Completed) {
             try {
                 const connectionID = payload.connectionRecord.id
@@ -173,10 +180,10 @@ const setupConnectionListener = (
 
 
 var credentialDefinitionID: string
-const didID = process.env.DID_ID || 'CHANGE_YOUR_DID_ID'
+const didID = process.env.DID_ID
 
 async function main() {
-    credentialDefinitionID = 'did:cheqd:testnet:87874297-d824-40ea-8ae5-364a1ec90101/resources/dfde04c2-eeca-4cd5-8ff8-36cb028dd198'
+    credentialDefinitionID = process.env.CREDENTIAL_DEFINITION_ID || 'value-unused-at-begin'
 
     try {
         console.log('Initializing issuer agent...')
@@ -191,7 +198,7 @@ async function main() {
         // credentialDefinitionID = await once.defineCredential(issuer, didID, schemaResult);
         // console.log('Credential definition id:', credentialDefinitionID)
         // process.exit(0)
-        
+
         // COMMENT AT FIRST EXECUTION
         console.log('Creating an invitation for holder...');
         const { outOfBandRecord, invitationUrl } = await createNewInvitation();
