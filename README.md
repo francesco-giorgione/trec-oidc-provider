@@ -107,9 +107,9 @@ d) Modificare i seguenti ulteriori parametri di sicurezza (opzionale per l'avvio
 | cookie.secure         | index.js    |
 
 
-e) Ricompilare il file `verification/verifier.ts` tramite il comando `tsc`;
+e) Ricompilare il file `verification/verifier.ts` tramite il comando `tsc`.
 
-f) Eseguire il comando di avvio:
+f) Eseguire il comando di avvio seguente.
 ```
     node index.js
 ```

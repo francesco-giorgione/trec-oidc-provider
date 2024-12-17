@@ -11,7 +11,7 @@ b) Assegnare valori significativi alle variabili di ambiente contenute nel file 
 
 `WALLET KEY`: chiave per la protezione del wallet dell'holder
 
-`DID_ID`: ID del DID che si vuole creare per l'agente (deve essere della forma cheqd:**testnet/mainnet**:92874297-d824-40ea-8ae5-364a1ec90063,
+`DID_ID`: ID del DID che si vuole creare per l'agente (deve essere della forma cheqd:**\[mainnet _or_ testnet\]**:92874297-d824-40ea-8ae5-364a1ec90063,
   le cifre dopo **testnet (o mainnet):** possono essere fissate in modo arbitario, ma devono essere univoche)
 
 `HOLDER_LABEL`: etichetta dell'holder
