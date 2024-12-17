@@ -1,15 +1,13 @@
 import {
     Agent,
-    CredentialsModule,
     AutoAcceptProof,
     ConnectionEventTypes,
     ConnectionsModule,
     ConnectionStateChangedEvent,
-    ConsoleLogger,
+    CredentialsModule,
     DidExchangeState,
     DidsModule,
     HttpOutboundTransport,
-    LogLevel,
     ProofEventTypes,
     ProofsModule,
     ProofState,
@@ -28,83 +26,84 @@ import {
     CheqdModuleConfig,
 } from '@credo-ts/cheqd';
 import {ariesAskar} from '@hyperledger/aries-askar-nodejs';
-import {
-    AnonCredsCredentialFormatService,
-    AnonCredsModule,
-    AnonCredsProofFormatService
-} from '@credo-ts/anoncreds';
+import {AnonCredsCredentialFormatService, AnonCredsModule, AnonCredsProofFormatService} from '@credo-ts/anoncreds';
 import {anoncreds} from '@hyperledger/anoncreds-nodejs';
 
-const verifierConfig = {
-    label: process.env.VERIFIER_LABEL || 'verifier-label',
-    walletConfig: {
-        id: process.env.VERIFIER_WALLET_ID || 'verifier-wallet-id',
-        key: process.env.VERIFIER_WALLET_KEY || 'verifier-wallet-key',
-    },
-    endpoints: [(process.env.VERIFIER_ENDPOINT || 'http://localhost:3003')],
-    // logger: new ConsoleLogger(LogLevel.debug)
-};
-
-export const verifier = new Agent({
-    config: verifierConfig,
-    dependencies: agentDependencies,
-    modules: {
-        askar: new AskarModule({
-            ariesAskar,
-        }),
-        connections: new ConnectionsModule({
-            autoAcceptConnections: true
-        }),
-        cheqd: new CheqdModule(
-            new CheqdModuleConfig({
-                networks: [
-                    {
-                        network: 'testnet',
-                        cosmosPayerSeed: 'grab onion alien short practice pyramid where demise napkin phrase ill pitch'
-                    },
-                ],
-            })
-        ),
-        dids: new DidsModule({
-            registrars: [new CheqdDidRegistrar()],
-            resolvers: [new CheqdDidResolver()],
-        }),
-        anoncreds: new AnonCredsModule({
-            registries: [new CheqdAnonCredsRegistry()],
-            anoncreds,
-        }),
-        credentials: new CredentialsModule({
-            credentialProtocols: [
-                new V2CredentialProtocol({
-                    credentialFormats: [new AnonCredsCredentialFormatService()],
-                }),
-            ],
-        }),
-        proofs: new ProofsModule({
-            autoAcceptProofs: AutoAcceptProof.ContentApproved,
-            proofProtocols: [
-                new V2ProofProtocol({
-                    proofFormats: [new AnonCredsProofFormatService()],
-                }),
-            ],
-        }),
-    },
-})
-
-verifier.registerOutboundTransport(new WsOutboundTransport())
-verifier.registerOutboundTransport(new HttpOutboundTransport())
-verifier.registerInboundTransport(new HttpInboundTransport({ port: 3003 }))
 
 const createNewInvitation = async (agent: Agent) => {
     const outOfBandRecord = await agent.oob.createInvitation()
-
+    
     return {
         oob: outOfBandRecord,
-        invitationUrl: outOfBandRecord.outOfBandInvitation.toUrl({ domain: 'http://localhost:3003' }),
+        // @ts-ignore
+        invitationUrl: outOfBandRecord.outOfBandInvitation.toUrl({ domain: process.env.VERIFIER_ENDPOINT }),
     }
 }
 
 export async function getInitializedAgent() {
+    const verifierConfig = {
+        label: process.env.VERIFIER_LABEL,
+        walletConfig: {
+            id: process.env.VERIFIER_WALLET_ID,
+            key: process.env.VERIFIER_WALLET_KEY,
+        },
+        endpoints: [process.env.VERIFIER_ENDPOINT],
+        // logger: new ConsoleLogger(LogLevel.debug)
+    };
+    
+    const verifier = new Agent({
+        // @ts-ignore
+        config: verifierConfig,
+        dependencies: agentDependencies,
+        modules: {
+            askar: new AskarModule({
+                ariesAskar,
+            }),
+            connections: new ConnectionsModule({
+                autoAcceptConnections: true
+            }),
+            cheqd: new CheqdModule(
+                new CheqdModuleConfig({
+                    networks: [
+                        {
+                            // @ts-ignore
+                            network: process.env.CHEQD_NETWORK,
+                            cosmosPayerSeed: process.env.COSMOS_PAYER_SEED 
+                        },
+                    ],
+                })
+            ),
+            dids: new DidsModule({
+                registrars: [new CheqdDidRegistrar()],
+                resolvers: [new CheqdDidResolver()],
+            }),
+            anoncreds: new AnonCredsModule({
+                registries: [new CheqdAnonCredsRegistry()],
+                anoncreds,
+            }),
+            credentials: new CredentialsModule({
+                credentialProtocols: [
+                    new V2CredentialProtocol({
+                        credentialFormats: [new AnonCredsCredentialFormatService()],
+                    }),
+                ],
+            }),
+            proofs: new ProofsModule({
+                autoAcceptProofs: AutoAcceptProof.ContentApproved,
+                proofProtocols: [
+                    new V2ProofProtocol({
+                        proofFormats: [new AnonCredsProofFormatService()],
+                    }),
+                ],
+            }),
+        },
+    })
+
+    verifier.registerOutboundTransport(new WsOutboundTransport())
+    verifier.registerOutboundTransport(new HttpOutboundTransport())
+    // @ts-ignore
+    verifier.registerInboundTransport(new HttpInboundTransport({ port: process.env.VERIFIER_PORT }))
+    
     try {
         await verifier.initialize();
         return verifier;
@@ -116,9 +115,7 @@ export async function getInitializedAgent() {
 export async function getInvitation(agent: Agent) {
     try {
         console.log('Creating the invitation for the holder...');
-        const invitation = await createNewInvitation(agent);
-
-        return invitation
+        return await createNewInvitation(agent)
     } catch (error) {
         console.error('Error:', error);
     }
@@ -225,6 +222,9 @@ export function setUpProofDoneListener(agent: Agent, objConnId: any, provider:an
                     }
                 }
                 else if(payload.proofRecord.state === ProofState.Abandoned) {
+                    // Ferma il timer
+                    clearTimeout(proofTimeoutDict[proofId][0])
+                    
                     result = {
                         login: req.session.accountId,
                         error: 'access_denied',
@@ -332,7 +332,5 @@ export async function sendProofRequest(agent: Agent, connectionRecordId: string)
         },
     })
 }
-
-// const credentialDefinitionId = 'did:cheqd:testnet:87874297-d824-40ea-8ae5-364a1ec90101/resources/dfde04c2-eeca-4cd5-8ff8-36cb028dd198'
 
 

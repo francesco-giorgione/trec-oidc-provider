@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifier = void 0;
 exports.getInitializedAgent = getInitializedAgent;
 exports.getInvitation = getInvitation;
 exports.setupConnectionListener = setupConnectionListener;
@@ -22,73 +21,77 @@ const cheqd_1 = require("@credo-ts/cheqd");
 const aries_askar_nodejs_1 = require("@hyperledger/aries-askar-nodejs");
 const anoncreds_1 = require("@credo-ts/anoncreds");
 const anoncreds_nodejs_1 = require("@hyperledger/anoncreds-nodejs");
-const verifierConfig = {
-    label: process.env.VERIFIER_LABEL || 'verifier-label',
-    walletConfig: {
-        id: process.env.VERIFIER_WALLET_ID || 'verifier-wallet-id',
-        key: process.env.VERIFIER_WALLET_KEY || 'verifier-wallet-key',
-    },
-    endpoints: [(process.env.VERIFIER_ENDPOINT || 'http://localhost:3003')],
-    // logger: new ConsoleLogger(LogLevel.debug)
-};
-exports.verifier = new core_1.Agent({
-    config: verifierConfig,
-    dependencies: node_1.agentDependencies,
-    modules: {
-        askar: new askar_1.AskarModule({
-            ariesAskar: aries_askar_nodejs_1.ariesAskar,
-        }),
-        connections: new core_1.ConnectionsModule({
-            autoAcceptConnections: true
-        }),
-        cheqd: new cheqd_1.CheqdModule(new cheqd_1.CheqdModuleConfig({
-            networks: [
-                {
-                    network: 'testnet',
-                    cosmosPayerSeed: 'grab onion alien short practice pyramid where demise napkin phrase ill pitch'
-                },
-            ],
-        })),
-        dids: new core_1.DidsModule({
-            registrars: [new cheqd_1.CheqdDidRegistrar()],
-            resolvers: [new cheqd_1.CheqdDidResolver()],
-        }),
-        anoncreds: new anoncreds_1.AnonCredsModule({
-            registries: [new cheqd_1.CheqdAnonCredsRegistry()],
-            anoncreds: anoncreds_nodejs_1.anoncreds,
-        }),
-        credentials: new core_1.CredentialsModule({
-            credentialProtocols: [
-                new core_1.V2CredentialProtocol({
-                    credentialFormats: [new anoncreds_1.AnonCredsCredentialFormatService()],
-                }),
-            ],
-        }),
-        proofs: new core_1.ProofsModule({
-            autoAcceptProofs: core_1.AutoAcceptProof.ContentApproved,
-            proofProtocols: [
-                new core_1.V2ProofProtocol({
-                    proofFormats: [new anoncreds_1.AnonCredsProofFormatService()],
-                }),
-            ],
-        }),
-    },
-});
-exports.verifier.registerOutboundTransport(new core_1.WsOutboundTransport());
-exports.verifier.registerOutboundTransport(new core_1.HttpOutboundTransport());
-exports.verifier.registerInboundTransport(new node_1.HttpInboundTransport({ port: 3003 }));
 const createNewInvitation = (agent) => __awaiter(void 0, void 0, void 0, function* () {
     const outOfBandRecord = yield agent.oob.createInvitation();
     return {
         oob: outOfBandRecord,
-        invitationUrl: outOfBandRecord.outOfBandInvitation.toUrl({ domain: 'http://localhost:3003' }),
+        // @ts-ignore
+        invitationUrl: outOfBandRecord.outOfBandInvitation.toUrl({ domain: process.env.VERIFIER_ENDPOINT }),
     };
 });
 function getInitializedAgent() {
     return __awaiter(this, void 0, void 0, function* () {
+        const verifierConfig = {
+            label: process.env.VERIFIER_LABEL,
+            walletConfig: {
+                id: process.env.VERIFIER_WALLET_ID,
+                key: process.env.VERIFIER_WALLET_KEY,
+            },
+            endpoints: [process.env.VERIFIER_ENDPOINT],
+            // logger: new ConsoleLogger(LogLevel.debug)
+        };
+        const verifier = new core_1.Agent({
+            // @ts-ignore
+            config: verifierConfig,
+            dependencies: node_1.agentDependencies,
+            modules: {
+                askar: new askar_1.AskarModule({
+                    ariesAskar: aries_askar_nodejs_1.ariesAskar,
+                }),
+                connections: new core_1.ConnectionsModule({
+                    autoAcceptConnections: true
+                }),
+                cheqd: new cheqd_1.CheqdModule(new cheqd_1.CheqdModuleConfig({
+                    networks: [
+                        {
+                            // @ts-ignore
+                            network: process.env.CHEQD_NETWORK,
+                            cosmosPayerSeed: process.env.COSMOS_PAYER_SEED
+                        },
+                    ],
+                })),
+                dids: new core_1.DidsModule({
+                    registrars: [new cheqd_1.CheqdDidRegistrar()],
+                    resolvers: [new cheqd_1.CheqdDidResolver()],
+                }),
+                anoncreds: new anoncreds_1.AnonCredsModule({
+                    registries: [new cheqd_1.CheqdAnonCredsRegistry()],
+                    anoncreds: anoncreds_nodejs_1.anoncreds,
+                }),
+                credentials: new core_1.CredentialsModule({
+                    credentialProtocols: [
+                        new core_1.V2CredentialProtocol({
+                            credentialFormats: [new anoncreds_1.AnonCredsCredentialFormatService()],
+                        }),
+                    ],
+                }),
+                proofs: new core_1.ProofsModule({
+                    autoAcceptProofs: core_1.AutoAcceptProof.ContentApproved,
+                    proofProtocols: [
+                        new core_1.V2ProofProtocol({
+                            proofFormats: [new anoncreds_1.AnonCredsProofFormatService()],
+                        }),
+                    ],
+                }),
+            },
+        });
+        verifier.registerOutboundTransport(new core_1.WsOutboundTransport());
+        verifier.registerOutboundTransport(new core_1.HttpOutboundTransport());
+        // @ts-ignore
+        verifier.registerInboundTransport(new node_1.HttpInboundTransport({ port: process.env.VERIFIER_PORT }));
         try {
-            yield exports.verifier.initialize();
-            return exports.verifier;
+            yield verifier.initialize();
+            return verifier;
         }
         catch (e) {
             console.log(e);
@@ -99,8 +102,7 @@ function getInvitation(agent) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             console.log('Creating the invitation for the holder...');
-            const invitation = yield createNewInvitation(agent);
-            return invitation;
+            return yield createNewInvitation(agent);
         }
         catch (error) {
             console.error('Error:', error);
@@ -199,6 +201,8 @@ function setUpProofDoneListener(agent, objConnId, provider, req, res, proofTimeo
                     }
                 }
                 else if (payload.proofRecord.state === core_1.ProofState.Abandoned) {
+                    // Ferma il timer
+                    clearTimeout(proofTimeoutDict[proofId][0]);
                     result = {
                         login: req.session.accountId,
                         error: 'access_denied',
@@ -305,4 +309,3 @@ function sendProofRequest(agent, connectionRecordId) {
         });
     });
 }
-// const credentialDefinitionId = 'did:cheqd:testnet:87874297-d824-40ea-8ae5-364a1ec90101/resources/dfde04c2-eeca-4cd5-8ff8-36cb028dd198'
