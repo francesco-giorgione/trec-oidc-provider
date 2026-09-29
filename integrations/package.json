@@ -1,0 +1,36 @@
+{
+  "name": "trec-decentralized-auth",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=20 <25"
+  },
+  "scripts": {
+    "start": "node run.cjs server",
+    "client": "node run.cjs client",
+    "test": "node --test tests/original.test.cjs tests/login.test.cjs tests/e2e.test.cjs tests/client.test.cjs tests/native.test.cjs",
+    "test:live": "node tests/live.cjs"
+  },
+  "dependencies": {
+    "@credo-ts/anoncreds": "0.5.13",
+    "@credo-ts/askar": "0.5.13",
+    "@credo-ts/cheqd": "0.5.13",
+    "@credo-ts/core": "0.5.13",
+    "@credo-ts/node": "0.5.13",
+    "@hyperledger/anoncreds-nodejs": "0.2.4",
+    "@hyperledger/aries-askar-nodejs": "0.2.3",
+    "dotenv": "16.4.5",
+    "express": "4.21.1",
+    "jose": "5.9.6",
+    "oidc-provider": "8.5.2",
+    "pug": "3.0.3",
+    "qrcode": "1.5.4"
+  },
+  "devDependencies": {
+    "jsqr": "1.4.0",
+    "pngjs": "5.0.0"
+  },
+  "overrides": {
+    "did-jwt": "8.0.4"
+  }
+}

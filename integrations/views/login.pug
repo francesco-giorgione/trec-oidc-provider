@@ -1,0 +1,23 @@
+doctype html
+html(lang="it")
+  head
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    title Accesso con credenziale TREC
+    link(rel="stylesheet" href="/public/style.css")
+    script(src="/public/login.js" defer)
+  body
+    main#login(data-uid=uid)
+      p.eyebrow AUTENTICAZIONE TREC
+      h1 Scansiona il QR con il tuo wallet
+      p Usa un wallet compatibile DIDComm e AnonCreds che possieda la tua credenziale TREC.
+      if qr
+        img.qr(src=qr alt="QR dell’invito DIDComm per questo accesso" width="400" height="400")
+      p#status(role="status" aria-live="polite")= status
+      details
+        summary Attributi richiesti per l’accesso
+        p issuerDid, holderDid, givenName, familyName, dateOfBirth, phone, email, fiscalCode, gender.
+        p Confermando la presentazione nel wallet autorizzi la condivisione di questi attributi con il client TREC.
+      form#complete(method="post" action='/interaction/'+uid+'/complete')
+        input(type="hidden" name="csrf" value=csrf)
+      a(href=clientUrl) Torna al client
